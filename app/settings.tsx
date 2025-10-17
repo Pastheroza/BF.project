@@ -29,6 +29,7 @@ export default function SettingsScreen() {
             backgroundColor: appColors.dark,
           },
           headerTintColor: appColors.light,
+          headerShadowVisible: false,
         }}
       />
 
@@ -40,7 +41,7 @@ export default function SettingsScreen() {
           {/* Настройка: Уведомления (notificationToggle) */}
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Bell size={24} color={appColors.positive} />
+              <Bell size={22} color={appColors.light} />
               <View style={styles.settingTextContainer}>
                 <Text style={styles.settingTitle}>Notifications</Text>
                 <Text style={styles.settingDescription}>
@@ -51,7 +52,7 @@ export default function SettingsScreen() {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: appColors.neutral, true: appColors.positive }}
+              trackColor={{ false: '#2a2a2a', true: '#3a3a3a' }}
               thumbColor={appColors.light}
             />
           </View>
@@ -59,7 +60,7 @@ export default function SettingsScreen() {
           {/* Настройка: Ценовые оповещения (priceAlertsToggle) */}
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Bell size={24} color={appColors.positive} />
+              <Bell size={22} color={appColors.light} />
               <View style={styles.settingTextContainer}>
                 <Text style={styles.settingTitle}>Price Alerts</Text>
                 <Text style={styles.settingDescription}>
@@ -70,7 +71,7 @@ export default function SettingsScreen() {
             <Switch
               value={priceAlertsEnabled}
               onValueChange={setPriceAlertsEnabled}
-              trackColor={{ false: appColors.neutral, true: appColors.positive }}
+              trackColor={{ false: '#2a2a2a', true: '#3a3a3a' }}
               thumbColor={appColors.light}
             />
           </View>
@@ -83,7 +84,7 @@ export default function SettingsScreen() {
           {/* Настройка: Язык (languageSetting) */}
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Globe size={24} color={appColors.positive} />
+              <Globe size={22} color={appColors.light} />
               <View style={styles.settingTextContainer}>
                 <Text style={styles.settingTitle}>Language</Text>
                 <Text style={styles.settingDescription}>English</Text>
@@ -95,7 +96,7 @@ export default function SettingsScreen() {
           {/* Настройка: Конфиденциальность (privacySetting) */}
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Shield size={24} color={appColors.positive} />
+              <Shield size={22} color={appColors.light} />
               <View style={styles.settingTextContainer}>
                 <Text style={styles.settingTitle}>Privacy</Text>
                 <Text style={styles.settingDescription}>
@@ -109,7 +110,7 @@ export default function SettingsScreen() {
           {/* Настройка: О приложении (aboutSetting) */}
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Info size={24} color={appColors.positive} />
+              <Info size={22} color={appColors.light} />
               <View style={styles.settingTextContainer}>
                 <Text style={styles.settingTitle}>About</Text>
                 <Text style={styles.settingDescription}>Version 1.0.0</Text>
@@ -150,10 +151,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: appColors.cardBg,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1a1a1a',
   },
   settingLeft: {
     flexDirection: 'row',
@@ -166,29 +168,27 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     color: appColors.light,
-    fontSize: 16,
-    fontWeight: '600' as const,
-    marginBottom: 4,
+    fontSize: 17,
+    fontWeight: '400' as const,
+    marginBottom: 2,
   },
   settingDescription: {
-    color: appColors.neutral,
-    fontSize: 14,
+    color: '#666',
+    fontSize: 13,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 20,
-    padding: 16,
-    backgroundColor: appColors.cardBg,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: appColors.negative,
-    gap: 12,
+    marginHorizontal: 20,
+    marginTop: 32,
+    marginBottom: 20,
+    paddingVertical: 16,
+    gap: 8,
   },
   logoutText: {
     color: appColors.negative,
-    fontSize: 16,
-    fontWeight: '600' as const,
+    fontSize: 17,
+    fontWeight: '400' as const,
   },
 });

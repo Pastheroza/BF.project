@@ -26,6 +26,7 @@ export default function ProfileScreen() {
             backgroundColor: appColors.dark,
           },
           headerTintColor: appColors.light,
+          headerShadowVisible: false,
         }}
       />
 
@@ -52,14 +53,14 @@ export default function ProfileScreen() {
           <View style={styles.statsCards}>
             {/* Карточка: Прочитано новостей (readNewsCard) */}
             <View style={styles.statCard}>
-              <Clock size={24} color={appColors.positive} />
+              <Clock size={24} color={appColors.light} />
               <Text style={styles.statValue}>156</Text>
               <Text style={styles.statLabel}>News Read</Text>
             </View>
 
             {/* Карточка: Сохранено (savedCard) */}
             <View style={styles.statCard}>
-              <Bookmark size={24} color={appColors.positive} />
+              <Bookmark size={24} color={appColors.light} />
               <Text style={styles.statValue}>23</Text>
               <Text style={styles.statLabel}>Saved</Text>
             </View>
@@ -68,14 +69,14 @@ export default function ProfileScreen() {
           <View style={styles.statsCards}>
             {/* Карточка: Точность прогнозов (accuracyCard) */}
             <View style={styles.statCard}>
-              <TrendingUp size={24} color={appColors.positive} />
+              <TrendingUp size={24} color={appColors.light} />
               <Text style={styles.statValue}>78%</Text>
               <Text style={styles.statLabel}>Forecast Accuracy</Text>
             </View>
 
             {/* Карточка: Достижения (achievementsCard) */}
             <View style={styles.statCard}>
-              <Award size={24} color={appColors.positive} />
+              <Award size={24} color={appColors.light} />
               <Text style={styles.statValue}>5</Text>
               <Text style={styles.statLabel}>Achievements</Text>
             </View>
@@ -133,8 +134,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-    borderWidth: 3,
-    borderColor: appColors.positive,
+    borderWidth: 2,
+    borderColor: '#2a2a2a',
   },
   userName: {
     color: appColors.light,
@@ -163,19 +164,21 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     backgroundColor: appColors.cardBg,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 20,
     alignItems: 'center',
     gap: 8,
+    borderWidth: 1,
+    borderColor: '#1a1a1a',
   },
   statValue: {
     color: appColors.light,
-    fontSize: 28,
-    fontWeight: '700' as const,
+    fontSize: 32,
+    fontWeight: '600' as const,
   },
   statLabel: {
-    color: appColors.neutral,
-    fontSize: 12,
+    color: '#666',
+    fontSize: 11,
     textAlign: 'center',
   },
   interestsSection: {
@@ -190,26 +193,26 @@ const styles = StyleSheet.create({
   interestChip: {
     backgroundColor: appColors.cardBg,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: appColors.positive,
+    borderColor: '#2a2a2a',
   },
   interestText: {
     color: appColors.light,
     fontSize: 14,
-    fontWeight: '600' as const,
+    fontWeight: '400' as const,
   },
   editButton: {
     margin: 20,
-    backgroundColor: appColors.positive,
+    backgroundColor: appColors.light,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   editButtonText: {
-    color: appColors.light,
-    fontSize: 16,
-    fontWeight: '700' as const,
+    color: appColors.dark,
+    fontSize: 17,
+    fontWeight: '600' as const,
   },
 });

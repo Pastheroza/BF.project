@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
+import { BlurView } from 'expo-blur';
 import { mockNewsData, NewsItem } from '@/mocks/news';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -82,11 +83,10 @@ function NewsCard({ item }: { item: NewsItem }) {
             resizeMode="cover"
           />
           
-          {/* Оверлей с градиентом для читаемости текста (newsOverlay) */}
-          <View style={styles.newsOverlay} />
-          
-          {/* Контейнер для текстового контента (newsTextContent) */}
-          <View style={styles.newsTextContent}>
+          {/* Блюр оверлей для читаемости текста (newsBlurOverlay) */}
+          <BlurView intensity={80} tint="dark" style={styles.newsBlurOverlay}>
+            {/* Контейнер для текстового контента (newsTextContent) */}
+            <View style={styles.newsTextContent}>
             {/* Метаинформация: источник и время (newsMeta) */}
             <View style={styles.newsMeta}>
               <Text style={styles.newsSource}>{item.source}</Text>
@@ -98,7 +98,8 @@ function NewsCard({ item }: { item: NewsItem }) {
             
             {/* Краткое описание новости (newsSnippet) */}
             <Text style={styles.newsSnippet} numberOfLines={2}>{item.snippet}</Text>
-          </View>
+            </View>
+          </BlurView>
         </View>
       </TouchableOpacity>
 
@@ -568,20 +569,18 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  newsOverlay: {
+  newsBlurOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: '70%',
-    backgroundColor: 'rgba(12, 12, 12, 0.85)',
+    overflow: 'hidden',
   },
   newsTextContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     padding: 20,
+    height: '100%',
+    justifyContent: 'flex-end',
   },
   newsMeta: {
     flexDirection: 'row',
