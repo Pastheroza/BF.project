@@ -195,12 +195,12 @@ function NewsCard({ item }: { item: NewsItem }) {
           {/* Заголовок секции прогноза (predictionTitle) */}
           <Text style={styles.predictionTitle}>Impact Forecast</Text>
           
-          {/* Контейнер сентимента - упрощенная версия (sentimentContainerSimple) */}
-          <View style={styles.sentimentContainerSimple}>
-            {/* Метка сентимента крупная (sentimentBadgeLarge) */}
+          {/* Краткий анализ влияния на акции (shortAnalysisContainer) */}
+          <View style={styles.shortAnalysisContainer}>
+            {/* Метка сентимента (sentimentBadgeSmall) */}
             <View
               style={[
-                styles.sentimentBadgeLarge,
+                styles.sentimentBadgeSmall,
                 {
                   backgroundColor:
                     item.prediction.sentiment === 'positive'
@@ -211,7 +211,7 @@ function NewsCard({ item }: { item: NewsItem }) {
                 },
               ]}
             >
-              <Text style={styles.sentimentTextLarge}>
+              <Text style={styles.sentimentTextSmall}>
                 {item.prediction.sentiment === 'positive'
                   ? 'POSITIVE'
                   : item.prediction.sentiment === 'negative'
@@ -220,8 +220,13 @@ function NewsCard({ item }: { item: NewsItem }) {
               </Text>
             </View>
             
+            {/* Текст краткого анализа (shortAnalysisText) */}
+            <Text style={styles.shortAnalysisText} numberOfLines={4}>
+              {item.prediction.shortAnalysis}
+            </Text>
+            
             {/* Подсказка для пользователя (tapForDetailsHint) */}
-            <Text style={styles.tapForDetailsHint}>Tap for detailed analysis</Text>
+            <Text style={styles.tapForDetailsHint}>Tap for detailed forecast</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -667,7 +672,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   predictionWindow: {
-    height: 180,
+    height: 220,
     borderRadius: 24,
     backgroundColor: appColors.cardBg,
     overflow: 'hidden',
@@ -675,35 +680,40 @@ const styles = StyleSheet.create({
   predictionContent: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   predictionTitle: {
     color: appColors.light,
     fontSize: 18,
     fontWeight: '700' as const,
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  shortAnalysisContainer: {
+    flex: 1,
+    gap: 12,
+  },
+  sentimentBadgeSmall: {
     alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
-  sentimentContainerSimple: {
-    alignItems: 'center',
-    gap: 16,
-  },
-  sentimentBadgeLarge: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 20,
-  },
-  sentimentTextLarge: {
+  sentimentTextSmall: {
     color: appColors.light,
-    fontSize: 24,
+    fontSize: 11,
     fontWeight: '700' as const,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
+  },
+  shortAnalysisText: {
+    color: appColors.light,
+    fontSize: 14,
+    lineHeight: 21,
+    flex: 1,
   },
   tapForDetailsHint: {
     color: appColors.neutral,
-    fontSize: 13,
+    fontSize: 12,
     fontStyle: 'italic' as const,
+    textAlign: 'center',
   },
   expandedContainer: {
     flex: 1,

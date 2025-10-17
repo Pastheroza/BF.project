@@ -27,7 +27,8 @@ export type Stock = {
 // Prediction - тип данных для прогноза
 export type Prediction = {
   sentiment: 'positive' | 'negative' | 'neutral'; // Overall sentiment
-  description: string; // Prediction description
+  shortAnalysis: string; // Brief critical analysis for preview (2-3 sentences)
+  description: string; // Detailed prediction description
   impactLevel: 'low' | 'medium' | 'high'; // Impact level
   timeframe: string; // Time horizon (e.g., "short-term", "long-term")
   keyPoints: string[]; // Key points of the prediction
@@ -60,7 +61,8 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'The launch of Vision Pro 2 could significantly increase Apple\'s revenue in the wearables segment.',
+      shortAnalysis: 'This product launch signals Apple\'s strong commitment to the AR/VR market. The improved specs should drive adoption among early adopters and enterprises, potentially boosting AAPL stock by 8-12% over the next quarter as investors price in future wearables revenue.',
+      description: 'The launch of Vision Pro 2 could significantly increase Apple\'s revenue in the wearables segment, establishing a stronger foothold in the emerging mixed reality market.',
       impactLevel: 'high',
       timeframe: 'Mid-term (3-6 months)',
       keyPoints: [
@@ -103,7 +105,8 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Record production strengthens Tesla\'s position as the leader in the electric vehicle market.',
+      shortAnalysis: 'Beating production targets by 12% demonstrates Tesla\'s operational excellence and growing demand. This should trigger analyst upgrades and push TSLA higher. Traditional automakers like GM and Ford face increased competitive pressure, likely seeing downward revisions.',
+      description: 'Record production strengthens Tesla\'s position as the leader in the electric vehicle market and validates their manufacturing scalability.',
       impactLevel: 'high',
       timeframe: 'Short-term (1-3 months)',
       keyPoints: [
@@ -146,7 +149,8 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'negative',
-      description: 'Rate cuts could negatively impact bank margins but stimulate the overall market.',
+      shortAnalysis: 'Lower interest rates compress bank net interest margins, which is why JPM, BAC, and GS are declining. However, this creates opportunity in rate-sensitive sectors like tech and real estate. Banks could see 5-8% downside near-term, but the broader market may rally.',
+      description: 'Rate cuts could negatively impact bank margins in the short term but ultimately stimulate broader economic activity and market growth.',
       impactLevel: 'medium',
       timeframe: 'Mid-term (3-6 months)',
       keyPoints: [
@@ -189,7 +193,8 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'The new chips strengthen NVIDIA\'s dominance in the $150 billion AI accelerator market.',
+      shortAnalysis: 'The H200 launch cements NVIDIA\'s AI chip monopoly. With 2x performance gains, hyperscalers will rush to upgrade, driving massive orders. NVDA could see 20-25% upside as revenue guidance increases. AMD and Intel face continued share loss and margin pressure.',
+      description: 'The new chips strengthen NVIDIA\'s dominance in the $150 billion AI accelerator market, creating a widening technological moat.',
       impactLevel: 'high',
       timeframe: 'Long-term (6-12 months)',
       keyPoints: [
@@ -232,7 +237,8 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Infrastructure investments strengthen AWS\'s position as the leader in the cloud market.',
+      shortAnalysis: 'Amazon\'s $10B infrastructure bet signals robust cloud demand and AI workload growth. While capex will temporarily pressure margins, this positions AWS to maintain its 32% market share lead. AMZN should see modest 3-5% gains as investors value long-term positioning over near-term margin compression.',
+      description: 'Infrastructure investments strengthen AWS\'s position as the leader in the cloud market and support the growing AI and enterprise workload demands.',
       impactLevel: 'medium',
       timeframe: 'Long-term (6-12 months)',
       keyPoints: [
