@@ -470,14 +470,13 @@ export default function NewsFeedScreen() {
   const insets = useSafeAreaInsets();
 
   // Обработчик изменения видимых элементов (onViewableItemsChanged)
-  const onViewableItemsChanged = useCallback(
+  const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (viewableItems.length > 0 && viewableItems[0]?.index !== null) {
         console.log('Current visible news:', viewableItems[0].index);
       }
-    },
-    []
-  );
+    }
+  ).current;
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 80,
