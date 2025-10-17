@@ -21,9 +21,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { mockNewsData, NewsItem } from '@/mocks/news';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const getScreenDimensions = () => Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = getScreenDimensions();
 
-const isDesktop = Platform.OS === 'web' && SCREEN_WIDTH >= 1024;
+const isDesktop = () => Platform.OS === 'web' && getScreenDimensions().width >= 1024;
 
 // Цветовая палитра приложения (appColors)
 const appColors = {
@@ -874,7 +875,7 @@ export default function NewsFeedScreen() {
     itemVisiblePercentThreshold: 80,
   }).current;
 
-  if (isDesktop) {
+  if (isDesktop()) {
     return (
       <View style={styles.container}>
         <Stack.Screen
@@ -891,7 +892,7 @@ export default function NewsFeedScreen() {
             <Settings size={24} color={appColors.light} />
           </TouchableOpacity>
           
-          <Text style={styles.appTitle}>FINfeed</Text>
+          <Text style={styles.appTitle}>BIAZ Finance</Text>
           
           <TouchableOpacity
             style={styles.headerButton}
@@ -934,7 +935,7 @@ export default function NewsFeedScreen() {
           <Settings size={24} color={appColors.light} />
         </TouchableOpacity>
         
-        <Text style={styles.appTitle}>FINfeed</Text>
+        <Text style={styles.appTitle}>BIAZ Finance</Text>
         
         <TouchableOpacity
           style={styles.headerButton}
