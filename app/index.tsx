@@ -12,6 +12,7 @@ import {
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
@@ -21,6 +22,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { mockNewsData, NewsItem } from '@/mocks/news';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const isDesktop = Platform.OS === 'web' && SCREEN_WIDTH >= 1024;
 
 // Цветовая палитра приложения (appColors)
 const appColors = {
@@ -464,6 +467,395 @@ function NewsCard({ item }: { item: NewsItem }) {
   );
 }
 
+// DesktopNewsCard - компонент для отображения одной новости в desktop режиме
+function DesktopNewsCard({ item }: { item: NewsItem }) {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isPredictionExpanded, setIsPredictionExpanded] = useState<boolean>(false);
+  const [currentStockIndex, setCurrentStockIndex] = useState<number>(0);
+  const insets = useSafeAreaInsets();
+
+  const handleNewsPress = useCallback(() => {
+    setIsExpanded(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsExpanded(false);
+  }, []);
+
+  const handlePredictionPress = useCallback(() => {
+    setIsPredictionExpanded(true);
+  }, []);
+
+  const handlePredictionClose = useCallback(() => {
+    setIsPredictionExpanded(false);
+  }, []);
+
+  const handleStockScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollViewWidth = 380;
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / scrollViewWidth);
+    setCurrentStockIndex(index);
+  }, []);
+
+  return (
+    <View style={styles.desktopNewsCardRow}>
+      <View style={styles.desktopNewsCardLeft}>
+        <TouchableOpacity 
+          style={styles.desktopNewsWindow} 
+          activeOpacity={0.95}
+          onPress={handleNewsPress}
+        >
+          <View style={styles.newsCardContent}>
+            <Image
+              source={{ uri: item.imageUrl }}
+              style={styles.newsImage}
+              resizeMode="cover"
+            />
+            
+            <LinearGradient
+              colors={['transparent', 'rgba(12, 12, 12, 0.5)', 'rgba(12, 12, 12, 0.85)', 'rgba(12, 12, 12, 0.95)']}
+              locations={[0.35, 0.5, 0.7, 1]}
+              style={styles.newsGradientOverlay}
+            >
+              <View style={styles.newsTextContent}>
+                <View style={styles.newsMeta}>
+                  <Text style={styles.newsSource}>{item.source}</Text>
+                  <Text style={styles.newsTimestamp}>{item.timestamp}</Text>
+                </View>
+                
+                <Text style={styles.newsTitle} numberOfLines={3}>{item.title}</Text>
+                <Text style={styles.newsSnippet} numberOfLines={2}>{item.snippet}</Text>
+              </View>
+            </LinearGradient>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.desktopNewsCardRight}>
+        <View style={styles.desktopStocksWindow}>
+          <View style={styles.stocksContent}>
+            <Text style={styles.stocksTitle}>Related Stocks</Text>
+            
+            <ScrollView 
+              horizontal 
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={380}
+              snapToAlignment="center"
+              onScroll={handleStockScroll}
+              scrollEventThrottle={16}
+            >
+              {item.relatedStocks.map((stock, index) => (
+                <View key={index} style={styles.desktopStockCard}>
+                  <View style={styles.stockMainInfo}>
+                    <Text style={styles.stockSymbolLarge}>{stock.symbol}</Text>
+                    <Text style={styles.stockPriceLarge}>
+                      ${stock.currentPrice.toFixed(2)}
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.priceChangeIconTopRight}>
+                    {stock.priceChange > 0 ? (
+                      <TrendingUp size={20} color={appColors.positive} />
+                    ) : stock.priceChange < 0 ? (
+                      <TrendingDown size={20} color={appColors.negative} />
+                    ) : (
+                      <Minus size={20} color={appColors.neutral} />
+                    )}
+                  </View>
+                  
+                  <Text
+                    style={[
+                      styles.stockChangeBottomRight,
+                      {
+                        color:
+                          stock.priceChange > 0
+                            ? appColors.positive
+                            : stock.priceChange < 0
+                            ? appColors.negative
+                            : appColors.neutral,
+                      },
+                    ]}
+                  >
+                    {stock.priceChange > 0 ? '+' : ''}
+                    {stock.priceChange.toFixed(2)}%
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+            
+            <View style={styles.paginationDots}>
+              {item.relatedStocks.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.paginationDot,
+                    {
+                      backgroundColor:
+                        index === currentStockIndex
+                          ? appColors.light
+                          : appColors.neutral,
+                      opacity: index === currentStockIndex ? 1 : 0.3,
+                    },
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+
+        <TouchableOpacity 
+          style={styles.desktopPredictionWindow}
+          activeOpacity={0.95}
+          onPress={handlePredictionPress}
+        >
+          <View style={styles.predictionContent}>
+            <Text style={styles.predictionTitle}>Impact Forecast</Text>
+            
+            <View style={styles.shortAnalysisContainer}>
+              <View
+                style={[
+                  styles.sentimentBadgeSmall,
+                  {
+                    backgroundColor:
+                      item.prediction.sentiment === 'positive'
+                        ? appColors.positive
+                        : item.prediction.sentiment === 'negative'
+                        ? appColors.negative
+                        : appColors.neutral,
+                  },
+                ]}
+              >
+                <Text style={styles.sentimentTextSmall}>
+                  {item.prediction.sentiment === 'positive'
+                    ? 'POSITIVE'
+                    : item.prediction.sentiment === 'negative'
+                    ? 'NEGATIVE'
+                    : 'NEUTRAL'}
+                </Text>
+              </View>
+              
+              <Text style={styles.shortAnalysisText} numberOfLines={4}>
+                {item.prediction.shortAnalysis}
+              </Text>
+              
+              <Text style={styles.tapForDetailsHint}>Tap for detailed forecast</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={isExpanded}
+        animationType="slide"
+        onRequestClose={handleClose}
+      >
+        <View style={styles.expandedContainer}>
+          <View style={[styles.expandedTopSpacer, { height: insets.top + 20 }]} />
+          
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={styles.expandedNewsImage}
+            resizeMode="cover"
+          />
+          
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 30 }]} onPress={handleClose}>
+            <X size={28} color={appColors.light} />
+          </TouchableOpacity>
+          
+          <ScrollView style={styles.expandedScrollView} contentContainerStyle={styles.expandedContent}>
+            <View style={styles.expandedNewsMeta}>
+              <Text style={styles.expandedNewsSource}>{item.source}</Text>
+              <Text style={styles.expandedNewsTimestamp}>{item.timestamp}</Text>
+            </View>
+            
+            <Text style={styles.expandedNewsTitle}>{item.title}</Text>
+            <Text style={styles.expandedNewsText}>{item.snippet}</Text>
+            
+            <Text style={styles.expandedSectionTitle}>Related Stocks</Text>
+            <View style={styles.expandedStocksList}>
+              {item.relatedStocks.map((stock, index) => (
+                <View key={index} style={styles.expandedStockCard}>
+                  <View style={styles.expandedStockHeader}>
+                    <Text style={styles.expandedStockSymbol}>{stock.symbol}</Text>
+                    {stock.priceChange > 0 ? (
+                      <TrendingUp size={20} color={appColors.positive} />
+                    ) : stock.priceChange < 0 ? (
+                      <TrendingDown size={20} color={appColors.negative} />
+                    ) : (
+                      <Minus size={20} color={appColors.neutral} />
+                    )}
+                  </View>
+                  <Text style={styles.expandedStockCompanyName}>{stock.companyName}</Text>
+                  <View style={styles.expandedStockPriceContainer}>
+                    <Text style={styles.expandedStockCurrentPrice}>
+                      ${stock.currentPrice.toFixed(2)}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.expandedStockPriceChange,
+                        {
+                          color:
+                            stock.priceChange > 0
+                              ? appColors.positive
+                              : stock.priceChange < 0
+                              ? appColors.negative
+                              : appColors.neutral,
+                        },
+                      ]}
+                    >
+                      {stock.priceChange > 0 ? '+' : ''}
+                      {stock.priceChange.toFixed(2)}% (${stock.priceChangeValue > 0 ? '+' : ''}
+                      {stock.priceChangeValue.toFixed(2)})
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+            
+            <Text style={styles.expandedSectionTitle}>Impact Forecast</Text>
+            <View
+              style={[
+                styles.expandedSentimentContainer,
+                {
+                  backgroundColor:
+                    item.prediction.sentiment === 'positive'
+                      ? `${appColors.positive}20`
+                      : item.prediction.sentiment === 'negative'
+                      ? `${appColors.negative}20`
+                      : `${appColors.neutral}20`,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.expandedSentimentBadge,
+                  {
+                    backgroundColor:
+                      item.prediction.sentiment === 'positive'
+                        ? appColors.positive
+                        : item.prediction.sentiment === 'negative'
+                        ? appColors.negative
+                        : appColors.neutral,
+                  },
+                ]}
+              >
+                <Text style={styles.expandedSentimentText}>
+                  {item.prediction.sentiment === 'positive'
+                    ? 'POSITIVE'
+                    : item.prediction.sentiment === 'negative'
+                    ? 'NEGATIVE'
+                    : 'NEUTRAL'}
+                </Text>
+              </View>
+              <Text style={styles.expandedImpactLevel}>
+                Impact Level:{' '}
+                <Text style={styles.expandedImpactLevelValue}>
+                  {item.prediction.impactLevel === 'high'
+                    ? 'HIGH'
+                    : item.prediction.impactLevel === 'medium'
+                    ? 'MEDIUM'
+                    : 'LOW'}
+                </Text>
+              </Text>
+            </View>
+            <Text style={styles.expandedTimeframe}>{item.prediction.timeframe}</Text>
+            <Text style={styles.expandedPredictionDescription}>
+              {item.prediction.description}
+            </Text>
+            <Text style={styles.expandedKeyPointsTitle}>Key Points:</Text>
+            <View style={styles.expandedKeyPointsList}>
+              {item.prediction.keyPoints.map((point, index) => (
+                <View key={index} style={styles.expandedKeyPointItem}>
+                  <View style={styles.expandedKeyPointBullet} />
+                  <Text style={styles.expandedKeyPointText}>{point}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isPredictionExpanded}
+        animationType="slide"
+        onRequestClose={handlePredictionClose}
+      >
+        <View style={styles.expandedContainer}>
+          <View style={[styles.expandedTopSpacer, { height: insets.top + 20 }]} />
+          
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 30 }]} onPress={handlePredictionClose}>
+            <X size={28} color={appColors.light} />
+          </TouchableOpacity>
+          
+          <ScrollView style={styles.expandedScrollView} contentContainerStyle={styles.expandedContent}>
+            <Text style={styles.expandedSectionTitle}>Impact Forecast</Text>
+            <View
+              style={[
+                styles.expandedSentimentContainer,
+                {
+                  backgroundColor:
+                    item.prediction.sentiment === 'positive'
+                      ? `${appColors.positive}20`
+                      : item.prediction.sentiment === 'negative'
+                      ? `${appColors.negative}20`
+                      : `${appColors.neutral}20`,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.expandedSentimentBadge,
+                  {
+                    backgroundColor:
+                      item.prediction.sentiment === 'positive'
+                        ? appColors.positive
+                        : item.prediction.sentiment === 'negative'
+                        ? appColors.negative
+                        : appColors.neutral,
+                  },
+                ]}
+              >
+                <Text style={styles.expandedSentimentText}>
+                  {item.prediction.sentiment === 'positive'
+                    ? 'POSITIVE'
+                    : item.prediction.sentiment === 'negative'
+                    ? 'NEGATIVE'
+                    : 'NEUTRAL'}
+                </Text>
+              </View>
+              <Text style={styles.expandedImpactLevel}>
+                Impact Level:{' '}
+                <Text style={styles.expandedImpactLevelValue}>
+                  {item.prediction.impactLevel === 'high'
+                    ? 'HIGH'
+                    : item.prediction.impactLevel === 'medium'
+                    ? 'MEDIUM'
+                    : 'LOW'}
+                </Text>
+              </Text>
+            </View>
+            <Text style={styles.expandedTimeframe}>{item.prediction.timeframe}</Text>
+            <Text style={styles.expandedPredictionDescription}>
+              {item.prediction.description}
+            </Text>
+            <Text style={styles.expandedKeyPointsTitle}>Key Points:</Text>
+            <View style={styles.expandedKeyPointsList}>
+              {item.prediction.keyPoints.map((point, index) => (
+                <View key={index} style={styles.expandedKeyPointItem}>
+                  <View style={styles.expandedKeyPointBullet} />
+                  <Text style={styles.expandedKeyPointText}>{point}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
 // NewsFeedScreen - главный экран с вертикальной прокруткой новостей
 export default function NewsFeedScreen() {
   const flatListRef = useRef<FlatList>(null);
@@ -482,6 +874,50 @@ export default function NewsFeedScreen() {
     itemVisiblePercentThreshold: 80,
   }).current;
 
+  if (isDesktop) {
+    return (
+      <View style={styles.container}>
+        <Stack.Screen
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <View style={[styles.headerContainer, { top: insets.top + 10 }]}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push('./settings')}
+          >
+            <Settings size={24} color={appColors.light} />
+          </TouchableOpacity>
+          
+          <Text style={styles.appTitle}>FINfeed</Text>
+          
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push('./profile')}
+          >
+            <User size={24} color={appColors.light} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.desktopContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={mockNewsData}
+            renderItem={({ item }) => <DesktopNewsCard item={item} />}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            style={styles.desktopNewsList}
+            contentContainerStyle={styles.desktopNewsListContent}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -497,6 +933,8 @@ export default function NewsFeedScreen() {
         >
           <Settings size={24} color={appColors.light} />
         </TouchableOpacity>
+        
+        <Text style={styles.appTitle}>FINfeed</Text>
         
         <TouchableOpacity
           style={styles.headerButton}
@@ -545,8 +983,15 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     zIndex: 100,
+  },
+  appTitle: {
+    color: appColors.light,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    letterSpacing: 0.5,
   },
   headerButton: {
     width: 44,
@@ -891,5 +1336,52 @@ const styles = StyleSheet.create({
     color: appColors.neutral,
     fontSize: 14,
     lineHeight: 22,
+  },
+  desktopContainer: {
+    flex: 1,
+    paddingTop: 100,
+  },
+  desktopNewsList: {
+    flex: 1,
+  },
+  desktopNewsListContent: {
+    padding: 20,
+  },
+  desktopNewsCardRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 20,
+    height: SCREEN_HEIGHT - 140,
+  },
+  desktopNewsCardLeft: {
+    flex: 1,
+  },
+  desktopNewsCardRight: {
+    width: 420,
+    gap: 20,
+  },
+  desktopNewsWindow: {
+    flex: 1,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: appColors.cardBg,
+  },
+  desktopStocksWindow: {
+    height: 140,
+    borderRadius: 24,
+    backgroundColor: appColors.cardBg,
+    overflow: 'hidden',
+  },
+  desktopStockCard: {
+    width: 380,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  desktopPredictionWindow: {
+    flex: 1,
+    borderRadius: 24,
+    backgroundColor: appColors.cardBg,
+    overflow: 'hidden',
   },
 });
