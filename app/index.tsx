@@ -88,7 +88,7 @@ function NewsCard({ item }: { item: NewsItem }) {
           
           {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
           <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.85)', 'rgba(0, 0, 0, 0.95)']}
+            colors={['transparent', 'rgba(12, 12, 12, 0.5)', 'rgba(12, 12, 12, 0.85)', 'rgba(12, 12, 12, 0.95)']}
             locations={[0.35, 0.5, 0.7, 1]}
             style={styles.newsGradientOverlay}
           >
@@ -247,7 +247,7 @@ function NewsCard({ item }: { item: NewsItem }) {
       >
         <View style={styles.expandedContainer}>
           {/* Безопасный отступ сверху (expandedTopSpacer) */}
-          <View style={[styles.expandedTopSpacer, { height: insets.top }]} />
+          <View style={[styles.expandedTopSpacer, { height: insets.top + 20 }]} />
           
           {/* Изображение в полноэкранном режиме (expandedNewsImage) */}
           <Image
@@ -257,7 +257,7 @@ function NewsCard({ item }: { item: NewsItem }) {
           />
           
           {/* Кнопка закрытия (closeButton) */}
-          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 10 }]} onPress={handleClose}>
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 30 }]} onPress={handleClose}>
             <X size={28} color={appColors.light} />
           </TouchableOpacity>
           
@@ -389,10 +389,10 @@ function NewsCard({ item }: { item: NewsItem }) {
       >
         <View style={styles.expandedContainer}>
           {/* Безопасный отступ сверху (expandedTopSpacer) */}
-          <View style={[styles.expandedTopSpacer, { height: insets.top }]} />
+          <View style={[styles.expandedTopSpacer, { height: insets.top + 20 }]} />
           
           {/* Кнопка закрытия (closeButton) */}
-          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 10 }]} onPress={handlePredictionClose}>
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 30 }]} onPress={handlePredictionClose}>
             <X size={28} color={appColors.light} />
           </TouchableOpacity>
           
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   newsTimestamp: {
-    color: appColors.neutral,
+    color: 'rgba(251, 251, 251, 0.6)',
     fontSize: 12,
   },
   newsTitle: {
