@@ -15,7 +15,8 @@ import {
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
-import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { mockNewsData, NewsItem } from '@/mocks/news';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -83,8 +84,12 @@ function NewsCard({ item }: { item: NewsItem }) {
             resizeMode="cover"
           />
           
-          {/* Блюр оверлей для читаемости текста (newsBlurOverlay) */}
-          <BlurView intensity={80} tint="dark" style={styles.newsBlurOverlay}>
+          {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.7)']}
+            locations={[0, 0.5, 1]}
+            style={styles.newsGradientOverlay}
+          >
             {/* Контейнер для текстового контента (newsTextContent) */}
             <View style={styles.newsTextContent}>
             {/* Метаинформация: источник и время (newsMeta) */}
@@ -99,7 +104,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             {/* Краткое описание новости (newsSnippet) */}
             <Text style={styles.newsSnippet} numberOfLines={2}>{item.snippet}</Text>
             </View>
-          </BlurView>
+          </LinearGradient>
         </View>
       </TouchableOpacity>
 
@@ -569,13 +574,12 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
-  newsBlurOverlay: {
+  newsGradientOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: '70%',
-    overflow: 'hidden',
   },
   newsTextContent: {
     padding: 20,
@@ -605,7 +609,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   newsSnippet: {
-    color: appColors.neutral,
+    color: 'rgba(251, 251, 251, 0.8)',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -663,7 +667,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 8,
+    marginTop: 4,
   },
   paginationDot: {
     width: 6,
