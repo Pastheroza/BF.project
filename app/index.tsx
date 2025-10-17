@@ -32,6 +32,8 @@ const appColors = {
 function NewsCard({ item }: { item: NewsItem }) {
   // Состояние для раскрытия новости на весь экран (isExpanded)
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  // Состояние для раскрытия прогноза на весь экран (isPredictionExpanded)
+  const [isPredictionExpanded, setIsPredictionExpanded] = useState<boolean>(false);
 
   // Обработчик нажатия на окно новости (handleNewsPress)
   const handleNewsPress = useCallback(() => {
@@ -41,6 +43,16 @@ function NewsCard({ item }: { item: NewsItem }) {
   // Обработчик закрытия полноэкранной новости (handleClose)
   const handleClose = useCallback(() => {
     setIsExpanded(false);
+  }, []);
+
+  // Обработчик нажатия на окно прогноза (handlePredictionPress)
+  const handlePredictionPress = useCallback(() => {
+    setIsPredictionExpanded(true);
+  }, []);
+
+  // Обработчик закрытия полноэкранного прогноза (handlePredictionClose)
+  const handlePredictionClose = useCallback(() => {
+    setIsPredictionExpanded(false);
   }, []);
 
   return (
@@ -92,43 +104,41 @@ function NewsCard({ item }: { item: NewsItem }) {
             contentContainerStyle={styles.stocksScrollContent}
           >
             {item.relatedStocks.map((stock, index) => (
-              // Компактная карточка акции (compactStockCard)
-              <View key={index} style={styles.compactStockCard}>
-                <View style={styles.stockTopRow}>
+              // Текстовый блок акции без темного фона (stockTextBlock)
+              <View key={index} style={styles.stockTextBlock}>
+                <View style={styles.stockInlineRow}>
                   {/* Тикер компании (stockSymbol) */}
                   <Text style={styles.stockSymbol}>{stock.symbol}</Text>
                   {/* Иконка изменения цены (priceChangeIcon) */}
                   {stock.priceChange > 0 ? (
-                    <TrendingUp size={16} color={appColors.positive} />
+                    <TrendingUp size={14} color={appColors.positive} style={styles.stockIcon} />
                   ) : stock.priceChange < 0 ? (
-                    <TrendingDown size={16} color={appColors.negative} />
+                    <TrendingDown size={14} color={appColors.negative} style={styles.stockIcon} />
                   ) : (
-                    <Minus size={16} color={appColors.neutral} />
+                    <Minus size={14} color={appColors.neutral} style={styles.stockIcon} />
                   )}
+                  {/* Текущая цена (stockPrice) */}
+                  <Text style={styles.stockPrice}>
+                    ${stock.currentPrice.toFixed(2)}
+                  </Text>
+                  {/* Изменение цены (stockChange) */}
+                  <Text
+                    style={[
+                      styles.stockChange,
+                      {
+                        color:
+                          stock.priceChange > 0
+                            ? appColors.positive
+                            : stock.priceChange < 0
+                            ? appColors.negative
+                            : appColors.neutral,
+                      },
+                    ]}
+                  >
+                    {stock.priceChange > 0 ? '+' : ''}
+                    {stock.priceChange.toFixed(2)}%
+                  </Text>
                 </View>
-                
-                {/* Текущая цена (stockPrice) */}
-                <Text style={styles.stockPrice}>
-                  ${stock.currentPrice.toFixed(2)}
-                </Text>
-                
-                {/* Изменение цены (stockChange) */}
-                <Text
-                  style={[
-                    styles.stockChange,
-                    {
-                      color:
-                        stock.priceChange > 0
-                          ? appColors.positive
-                          : stock.priceChange < 0
-                          ? appColors.negative
-                          : appColors.neutral,
-                    },
-                  ]}
-                >
-                  {stock.priceChange > 0 ? '+' : ''}
-                  {stock.priceChange.toFixed(2)}%
-                </Text>
               </View>
             ))}
           </ScrollView>
@@ -136,7 +146,11 @@ function NewsCard({ item }: { item: NewsItem }) {
       </View>
 
       {/* Окно 3: Прогноз влияния (predictionWindow) - 30% экрана */}
-      <View style={styles.predictionWindow}>
+      <TouchableOpacity 
+        style={styles.predictionWindow}
+        activeOpacity={0.95}
+        onPress={handlePredictionPress}
+      >
         <View style={styles.predictionContent}>
           {/* Заголовок секции прогноза (predictionTitle) */}
           <Text style={styles.predictionTitle}>Impact Forecast</Text>
@@ -199,7 +213,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             {item.prediction.description}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Модальное окно для полноэкранного просмотра новости (expandedNewsModal) */}
       <Modal
@@ -277,6 +291,83 @@ function NewsCard({ item }: { item: NewsItem }) {
             </View>
             
             {/* Прогноз в развернутом виде (expandedPredictionSection) */}
+            <Text style={styles.expandedSectionTitle}>Impact Forecast</Text>
+            <View
+              style={[
+                styles.expandedSentimentContainer,
+                {
+                  backgroundColor:
+                    item.prediction.sentiment === 'positive'
+                      ? `${appColors.positive}20`
+                      : item.prediction.sentiment === 'negative'
+                      ? `${appColors.negative}20`
+                      : `${appColors.neutral}20`,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.expandedSentimentBadge,
+                  {
+                    backgroundColor:
+                      item.prediction.sentiment === 'positive'
+                        ? appColors.positive
+                        : item.prediction.sentiment === 'negative'
+                        ? appColors.negative
+                        : appColors.neutral,
+                  },
+                ]}
+              >
+                <Text style={styles.expandedSentimentText}>
+                  {item.prediction.sentiment === 'positive'
+                    ? 'POSITIVE'
+                    : item.prediction.sentiment === 'negative'
+                    ? 'NEGATIVE'
+                    : 'NEUTRAL'}
+                </Text>
+              </View>
+              <Text style={styles.expandedImpactLevel}>
+                Impact Level:{' '}
+                <Text style={styles.expandedImpactLevelValue}>
+                  {item.prediction.impactLevel === 'high'
+                    ? 'HIGH'
+                    : item.prediction.impactLevel === 'medium'
+                    ? 'MEDIUM'
+                    : 'LOW'}
+                </Text>
+              </Text>
+            </View>
+            <Text style={styles.expandedTimeframe}>{item.prediction.timeframe}</Text>
+            <Text style={styles.expandedPredictionDescription}>
+              {item.prediction.description}
+            </Text>
+            <Text style={styles.expandedKeyPointsTitle}>Key Points:</Text>
+            <View style={styles.expandedKeyPointsList}>
+              {item.prediction.keyPoints.map((point, index) => (
+                <View key={index} style={styles.expandedKeyPointItem}>
+                  <View style={styles.expandedKeyPointBullet} />
+                  <Text style={styles.expandedKeyPointText}>{point}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Модальное окно для полноэкранного просмотра прогноза (expandedPredictionModal) */}
+      <Modal
+        visible={isPredictionExpanded}
+        animationType="slide"
+        onRequestClose={handlePredictionClose}
+      >
+        <View style={styles.expandedContainer}>
+          {/* Кнопка закрытия (closeButton) */}
+          <TouchableOpacity style={styles.closeButton} onPress={handlePredictionClose}>
+            <X size={28} color={appColors.light} />
+          </TouchableOpacity>
+          
+          {/* Прокручиваемый контент прогноза (expandedPredictionScrollContent) */}
+          <ScrollView style={styles.expandedScrollView} contentContainerStyle={styles.expandedContent}>
             <Text style={styles.expandedSectionTitle}>Impact Forecast</Text>
             <View
               style={[
@@ -523,33 +614,31 @@ const styles = StyleSheet.create({
   },
   stocksScrollContent: {
     paddingHorizontal: 16,
-    gap: 12,
+    gap: 20,
   },
-  compactStockCard: {
-    backgroundColor: appColors.dark,
-    borderRadius: 16,
-    padding: 12,
-    minWidth: 120,
-    gap: 4,
+  stockTextBlock: {
+    paddingRight: 20,
   },
-  stockTopRow: {
+  stockInlineRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: 8,
   },
   stockSymbol: {
     color: appColors.light,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700' as const,
+  },
+  stockIcon: {
+    marginTop: 2,
   },
   stockPrice: {
     color: appColors.light,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600' as const,
   },
   stockChange: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600' as const,
   },
   predictionWindow: {

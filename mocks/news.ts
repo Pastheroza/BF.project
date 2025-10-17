@@ -9,39 +9,39 @@ export type NewsItem = {
   timestamp: string; // Время публикации
   
   // Секция 2: Информация о ценах акций (stocksSection)
-  relatedStocks: Stock[]; // Массив связанных компаний и их акций
+  relatedStocks: Stock[]; // Array of related companies and their stocks
   
   // Секция 3: Прогноз влияния (predictionSection)
-  prediction: Prediction; // Прогноз влияния новости
+  prediction: Prediction; // Prediction of news impact
 };
 
 // Stock - тип данных для информации об акции
 export type Stock = {
-  symbol: string; // Тикер компании (например, "AAPL")
-  companyName: string; // Название компании (например, "Apple Inc.")
-  currentPrice: number; // Текущая цена акции
-  priceChange: number; // Изменение цены в процентах
-  priceChangeValue: number; // Изменение цены в долларах
+  symbol: string; // Company ticker (e.g., "AAPL")
+  companyName: string; // Company name (e.g., "Apple Inc.")
+  currentPrice: number; // Current stock price
+  priceChange: number; // Price change in percentage
+  priceChangeValue: number; // Price change in dollars
 };
 
 // Prediction - тип данных для прогноза
 export type Prediction = {
-  sentiment: 'positive' | 'negative' | 'neutral'; // Общий сентимент
-  description: string; // Описание прогноза
-  impactLevel: 'low' | 'medium' | 'high'; // Уровень влияния
-  timeframe: string; // Временной горизонт (например, "краткосрочный", "долгосрочный")
-  keyPoints: string[]; // Ключевые пункты прогноза
+  sentiment: 'positive' | 'negative' | 'neutral'; // Overall sentiment
+  description: string; // Prediction description
+  impactLevel: 'low' | 'medium' | 'high'; // Impact level
+  timeframe: string; // Time horizon (e.g., "short-term", "long-term")
+  keyPoints: string[]; // Key points of the prediction
 };
 
 // mockNewsData - массив новостей для демонстрации
 export const mockNewsData: NewsItem[] = [
   {
     id: '1',
-    title: 'Apple представила революционный Vision Pro 2',
-    snippet: 'Apple анонсировала вторую версию гарнитуры смешанной реальности с улучшенным разрешением и автономностью до 8 часов.',
+    title: 'Apple Unveils Revolutionary Vision Pro 2',
+    snippet: 'Apple announced the second version of its mixed reality headset with improved resolution and up to 8 hours of battery life.',
     imageUrl: 'https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=800&q=80',
     source: 'Bloomberg',
-    timestamp: '2 часа назад',
+    timestamp: '2 hours ago',
     relatedStocks: [
       {
         symbol: 'AAPL',
@@ -60,24 +60,24 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Запуск Vision Pro 2 может значительно увеличить доходы Apple в сегменте носимых устройств.',
+      description: 'The launch of Vision Pro 2 could significantly increase Apple\'s revenue in the wearables segment.',
       impactLevel: 'high',
-      timeframe: 'Среднесрочный (3-6 месяцев)',
+      timeframe: 'Mid-term (3-6 months)',
       keyPoints: [
-        'Потенциальный рост выручки на 15-20% в Q2',
-        'Увеличение доли рынка AR/VR устройств',
-        'Возможное давление на конкурентов (Meta, Sony)',
-        'Позитивное влияние на экосистему разработчиков'
+        'Potential revenue growth of 15-20% in Q2',
+        'Increased market share in AR/VR devices',
+        'Potential pressure on competitors (Meta, Sony)',
+        'Positive impact on developer ecosystem'
       ]
     }
   },
   {
     id: '2',
-    title: 'Tesla достигла рекордного уровня производства',
-    snippet: 'Tesla сообщила о производстве 500,000 электромобилей в последнем квартале, превысив ожидания аналитиков на 12%.',
+    title: 'Tesla Reaches Record Production Levels',
+    snippet: 'Tesla reported producing 500,000 electric vehicles in the last quarter, exceeding analyst expectations by 12%.',
     imageUrl: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80',
     source: 'Reuters',
-    timestamp: '4 часа назад',
+    timestamp: '4 hours ago',
     relatedStocks: [
       {
         symbol: 'TSLA',
@@ -103,24 +103,24 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Рекордное производство укрепляет позиции Tesla как лидера рынка электромобилей.',
+      description: 'Record production strengthens Tesla\'s position as the leader in the electric vehicle market.',
       impactLevel: 'high',
-      timeframe: 'Краткосрочный (1-3 месяца)',
+      timeframe: 'Short-term (1-3 months)',
       keyPoints: [
-        'Превышение прогнозов может привести к росту на 8-10%',
-        'Улучшение операционной эффективности',
-        'Негативное давление на традиционных автопроизводителей',
-        'Возможное повышение целевой цены аналитиками'
+        'Exceeding forecasts could lead to 8-10% growth',
+        'Improved operational efficiency',
+        'Negative pressure on traditional automakers',
+        'Possible analyst target price increases'
       ]
     }
   },
   {
     id: '3',
-    title: 'ФРС сигнализирует о возможном снижении ставок',
-    snippet: 'Федеральная резервная система США намекнула на потенциальное снижение процентных ставок в следующем квартале.',
+    title: 'Fed Signals Possible Rate Cuts',
+    snippet: 'The Federal Reserve hinted at a potential reduction in interest rates in the next quarter.',
     imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
     source: 'Financial Times',
-    timestamp: '6 часов назад',
+    timestamp: '6 hours ago',
     relatedStocks: [
       {
         symbol: 'JPM',
@@ -146,24 +146,24 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'negative',
-      description: 'Снижение ставок может негативно повлиять на маржу банков, но стимулировать общий рынок.',
+      description: 'Rate cuts could negatively impact bank margins but stimulate the overall market.',
       impactLevel: 'medium',
-      timeframe: 'Среднесрочный (3-6 месяцев)',
+      timeframe: 'Mid-term (3-6 months)',
       keyPoints: [
-        'Сжатие процентной маржи для банков',
-        'Позитив для технологических компаний с высокой оценкой',
-        'Возможный рост кредитования',
-        'Общее стимулирование экономики'
+        'Compression of interest margins for banks',
+        'Positive for high-valuation tech companies',
+        'Potential lending growth',
+        'Overall economic stimulus'
       ]
     }
   },
   {
     id: '4',
-    title: 'NVIDIA анонсирует новое поколение чипов для ИИ',
-    snippet: 'NVIDIA представила чипы H200, обещающие 2x производительность в задачах машинного обучения по сравнению с H100.',
+    title: 'NVIDIA Announces New Generation of AI Chips',
+    snippet: 'NVIDIA introduced the H200 chips, promising 2x performance in machine learning tasks compared to the H100.',
     imageUrl: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80',
     source: 'TechCrunch',
-    timestamp: '8 часов назад',
+    timestamp: '8 hours ago',
     relatedStocks: [
       {
         symbol: 'NVDA',
@@ -189,24 +189,24 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Новые чипы укрепляют доминирование NVIDIA на рынке ИИ-ускорителей стоимостью $150 млрд.',
+      description: 'The new chips strengthen NVIDIA\'s dominance in the $150 billion AI accelerator market.',
       impactLevel: 'high',
-      timeframe: 'Долгосрочный (6-12 месяцев)',
+      timeframe: 'Long-term (6-12 months)',
       keyPoints: [
-        'Ожидаемый рост выручки на 25-30% в 2025',
-        'Увеличение отрыва от конкурентов',
-        'Высокий спрос от крупных tech-компаний',
-        'Риск регуляторных ограничений на экспорт в Китай'
+        'Expected revenue growth of 25-30% in 2025',
+        'Widening gap from competitors',
+        'High demand from major tech companies',
+        'Risk of regulatory restrictions on exports to China'
       ]
     }
   },
   {
     id: '5',
-    title: 'Amazon расширяет сеть дата-центров',
-    snippet: 'Amazon Web Services объявила об инвестициях в $10 млрд для строительства новых облачных дата-центров.',
+    title: 'Amazon Expands Data Center Network',
+    snippet: 'Amazon Web Services announced a $10 billion investment to build new cloud data centers.',
     imageUrl: 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=800&q=80',
     source: 'CNBC',
-    timestamp: '10 часов назад',
+    timestamp: '10 hours ago',
     relatedStocks: [
       {
         symbol: 'AMZN',
@@ -232,14 +232,14 @@ export const mockNewsData: NewsItem[] = [
     ],
     prediction: {
       sentiment: 'positive',
-      description: 'Инвестиции в инфраструктуру укрепляют позиции AWS как лидера облачного рынка.',
+      description: 'Infrastructure investments strengthen AWS\'s position as the leader in the cloud market.',
       impactLevel: 'medium',
-      timeframe: 'Долгосрочный (6-12 месяцев)',
+      timeframe: 'Long-term (6-12 months)',
       keyPoints: [
-        'Поддержание лидерства на рынке cloud (32% доли)',
-        'Увеличение капитальных затрат может давить на маржу',
-        'Позитивный сигнал о росте спроса на облачные услуги',
-        'Конкуренция с Microsoft Azure и Google Cloud'
+        'Maintaining cloud market leadership (32% share)',
+        'Increased capital expenditures may pressure margins',
+        'Positive signal of growing demand for cloud services',
+        'Competition with Microsoft Azure and Google Cloud'
       ]
     }
   }
