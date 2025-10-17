@@ -10,6 +10,8 @@ import {
   ScrollView,
   ViewToken,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
@@ -34,6 +36,8 @@ function NewsCard({ item }: { item: NewsItem }) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   // Состояние для раскрытия прогноза на весь экран (isPredictionExpanded)
   const [isPredictionExpanded, setIsPredictionExpanded] = useState<boolean>(false);
+  // Состояние для текущего индекса акции в горизонтальной прокрутке (currentStockIndex)
+  const [currentStockIndex, setCurrentStockIndex] = useState<number>(0);
 
   // Обработчик нажатия на окно новости (handleNewsPress)
   const handleNewsPress = useCallback(() => {
@@ -53,6 +57,13 @@ function NewsCard({ item }: { item: NewsItem }) {
   // Обработчик закрытия полноэкранного прогноза (handlePredictionClose)
   const handlePredictionClose = useCallback(() => {
     setIsPredictionExpanded(false);
+  }, []);
+
+  // Обработчик горизонтальной прокрутки акций (handleStockScroll)
+  const handleStockScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / (SCREEN_WIDTH - 32));
+    setCurrentStockIndex(index);
   }, []);
 
   return (
@@ -97,51 +108,80 @@ function NewsCard({ item }: { item: NewsItem }) {
           {/* Заголовок секции акций (stocksTitle) */}
           <Text style={styles.stocksTitle}>Related Stocks</Text>
           
-          {/* Горизонтальный список акций (stocksHorizontalList) */}
+          {/* Горизонтальный пагинированный список акций (stocksPaginatedList) */}
           <ScrollView 
             horizontal 
+            pagingEnabled
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.stocksScrollContent}
+            decelerationRate="fast"
+            snapToInterval={SCREEN_WIDTH - 32}
+            snapToAlignment="center"
+            onScroll={handleStockScroll}
+            scrollEventThrottle={16}
           >
             {item.relatedStocks.map((stock, index) => (
-              // Текстовый блок акции без темного фона (stockTextBlock)
-              <View key={index} style={styles.stockTextBlock}>
-                <View style={styles.stockInlineRow}>
-                  {/* Тикер компании (stockSymbol) */}
-                  <Text style={styles.stockSymbol}>{stock.symbol}</Text>
-                  {/* Иконка изменения цены (priceChangeIcon) */}
-                  {stock.priceChange > 0 ? (
-                    <TrendingUp size={14} color={appColors.positive} style={styles.stockIcon} />
-                  ) : stock.priceChange < 0 ? (
-                    <TrendingDown size={14} color={appColors.negative} style={styles.stockIcon} />
-                  ) : (
-                    <Minus size={14} color={appColors.neutral} style={styles.stockIcon} />
-                  )}
-                  {/* Текущая цена (stockPrice) */}
-                  <Text style={styles.stockPrice}>
+              // Карточка одной акции на весь экран (stockCard)
+              <View key={index} style={styles.stockCard}>
+                <View style={styles.stockMainInfo}>
+                  {/* Тикер компании с увеличенным шрифтом (stockSymbolLarge) */}
+                  <Text style={styles.stockSymbolLarge}>{stock.symbol}</Text>
+                  
+                  {/* Текущая цена с увеличенным шрифтом (stockPriceLarge) */}
+                  <Text style={styles.stockPriceLarge}>
                     ${stock.currentPrice.toFixed(2)}
                   </Text>
-                  {/* Изменение цены (stockChange) */}
-                  <Text
-                    style={[
-                      styles.stockChange,
-                      {
-                        color:
-                          stock.priceChange > 0
-                            ? appColors.positive
-                            : stock.priceChange < 0
-                            ? appColors.negative
-                            : appColors.neutral,
-                      },
-                    ]}
-                  >
-                    {stock.priceChange > 0 ? '+' : ''}
-                    {stock.priceChange.toFixed(2)}%
-                  </Text>
                 </View>
+                
+                {/* Иконка изменения в верхнем правом углу (priceChangeIconTopRight) */}
+                <View style={styles.priceChangeIconTopRight}>
+                  {stock.priceChange > 0 ? (
+                    <TrendingUp size={20} color={appColors.positive} />
+                  ) : stock.priceChange < 0 ? (
+                    <TrendingDown size={20} color={appColors.negative} />
+                  ) : (
+                    <Minus size={20} color={appColors.neutral} />
+                  )}
+                </View>
+                
+                {/* Процент изменения в нижнем правом углу (stockChangeBottomRight) */}
+                <Text
+                  style={[
+                    styles.stockChangeBottomRight,
+                    {
+                      color:
+                        stock.priceChange > 0
+                          ? appColors.positive
+                          : stock.priceChange < 0
+                          ? appColors.negative
+                          : appColors.neutral,
+                    },
+                  ]}
+                >
+                  {stock.priceChange > 0 ? '+' : ''}
+                  {stock.priceChange.toFixed(2)}%
+                </Text>
               </View>
             ))}
           </ScrollView>
+          
+          {/* Индикаторы пагинации (paginationDots) */}
+          <View style={styles.paginationDots}>
+            {item.relatedStocks.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.paginationDot,
+                  {
+                    backgroundColor:
+                      index === currentStockIndex
+                        ? appColors.light
+                        : appColors.neutral,
+                    opacity: index === currentStockIndex ? 1 : 0.3,
+                  },
+                ]}
+              />
+            ))}
+          </View>
         </View>
       </View>
 
@@ -155,24 +195,12 @@ function NewsCard({ item }: { item: NewsItem }) {
           {/* Заголовок секции прогноза (predictionTitle) */}
           <Text style={styles.predictionTitle}>Impact Forecast</Text>
           
-          {/* Контейнер сентимента (sentimentContainer) */}
-          <View
-            style={[
-              styles.sentimentContainer,
-              {
-                backgroundColor:
-                  item.prediction.sentiment === 'positive'
-                    ? `${appColors.positive}20`
-                    : item.prediction.sentiment === 'negative'
-                    ? `${appColors.negative}20`
-                    : `${appColors.neutral}20`,
-              },
-            ]}
-          >
-            {/* Метка сентимента (sentimentBadge) */}
+          {/* Контейнер сентимента - упрощенная версия (sentimentContainerSimple) */}
+          <View style={styles.sentimentContainerSimple}>
+            {/* Метка сентимента крупная (sentimentBadgeLarge) */}
             <View
               style={[
-                styles.sentimentBadge,
+                styles.sentimentBadgeLarge,
                 {
                   backgroundColor:
                     item.prediction.sentiment === 'positive'
@@ -183,7 +211,7 @@ function NewsCard({ item }: { item: NewsItem }) {
                 },
               ]}
             >
-              <Text style={styles.sentimentText}>
+              <Text style={styles.sentimentTextLarge}>
                 {item.prediction.sentiment === 'positive'
                   ? 'POSITIVE'
                   : item.prediction.sentiment === 'negative'
@@ -192,26 +220,9 @@ function NewsCard({ item }: { item: NewsItem }) {
               </Text>
             </View>
             
-            {/* Уровень влияния (impactLevel) */}
-            <Text style={styles.impactLevel}>
-              Impact Level:{' '}
-              <Text style={styles.impactLevelValue}>
-                {item.prediction.impactLevel === 'high'
-                  ? 'HIGH'
-                  : item.prediction.impactLevel === 'medium'
-                  ? 'MEDIUM'
-                  : 'LOW'}
-              </Text>
-            </Text>
+            {/* Подсказка для пользователя (tapForDetailsHint) */}
+            <Text style={styles.tapForDetailsHint}>Tap for detailed analysis</Text>
           </View>
-          
-          {/* Временной горизонт (timeframe) */}
-          <Text style={styles.timeframe}>{item.prediction.timeframe}</Text>
-          
-          {/* Описание прогноза (predictionDescription) */}
-          <Text style={styles.predictionDescription} numberOfLines={3}>
-            {item.prediction.description}
-          </Text>
         </View>
       </TouchableOpacity>
 
@@ -603,43 +614,57 @@ const styles = StyleSheet.create({
   },
   stocksContent: {
     flex: 1,
-    paddingVertical: 16,
+    paddingTop: 12,
   },
   stocksTitle: {
     color: appColors.light,
     fontSize: 16,
     fontWeight: '700' as const,
-    marginBottom: 12,
+    marginBottom: 8,
     paddingHorizontal: 16,
   },
-  stocksScrollContent: {
+  stockCard: {
+    width: SCREEN_WIDTH - 32,
     paddingHorizontal: 16,
-    gap: 20,
+    justifyContent: 'center',
+    position: 'relative',
   },
-  stockTextBlock: {
-    paddingRight: 20,
+  stockMainInfo: {
+    flexDirection: 'column',
+    gap: 4,
   },
-  stockInlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stockSymbol: {
+  stockSymbolLarge: {
     color: appColors.light,
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '700' as const,
   },
-  stockIcon: {
-    marginTop: 2,
-  },
-  stockPrice: {
+  stockPriceLarge: {
     color: appColors.light,
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: '600' as const,
   },
-  stockChange: {
-    fontSize: 14,
+  priceChangeIconTopRight: {
+    position: 'absolute',
+    top: 0,
+    right: 16,
+  },
+  stockChangeBottomRight: {
+    position: 'absolute',
+    bottom: 0,
+    right: 16,
+    fontSize: 18,
     fontWeight: '600' as const,
+  },
+  paginationDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  paginationDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   predictionWindow: {
     height: 180,
@@ -650,48 +675,35 @@ const styles = StyleSheet.create({
   predictionContent: {
     flex: 1,
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   predictionTitle: {
     color: appColors.light,
     fontSize: 18,
     fontWeight: '700' as const,
-    marginBottom: 16,
-  },
-  sentimentContainer: {
-    borderRadius: 16,
-    padding: 12,
-    marginBottom: 12,
-  },
-  sentimentBadge: {
+    marginBottom: 24,
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 8,
   },
-  sentimentText: {
+  sentimentContainerSimple: {
+    alignItems: 'center',
+    gap: 16,
+  },
+  sentimentBadgeLarge: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 20,
+  },
+  sentimentTextLarge: {
     color: appColors.light,
-    fontSize: 10,
+    fontSize: 24,
     fontWeight: '700' as const,
+    letterSpacing: 1,
   },
-  impactLevel: {
+  tapForDetailsHint: {
     color: appColors.neutral,
-    fontSize: 12,
-  },
-  impactLevelValue: {
-    color: appColors.light,
-    fontWeight: '700' as const,
-  },
-  timeframe: {
-    color: appColors.positive,
-    fontSize: 12,
-    fontWeight: '600' as const,
-    marginBottom: 8,
-  },
-  predictionDescription: {
-    color: appColors.light,
     fontSize: 13,
-    lineHeight: 20,
+    fontStyle: 'italic' as const,
   },
   expandedContainer: {
     flex: 1,
