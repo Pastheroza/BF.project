@@ -88,7 +88,7 @@ function NewsCard({ item }: { item: NewsItem }) {
           
           {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
           <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.85)', 'rgba(0, 0, 0, 0.95)']}
+            colors={['transparent', 'rgba(12, 12, 12, 0.5)', 'rgba(12, 12, 12, 0.85)', 'rgba(12, 12, 12, 0.95)']}
             locations={[0.35, 0.5, 0.7, 1]}
             style={styles.newsGradientOverlay}
           >
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     backgroundColor: appColors.dark,
-    paddingTop: 110,
+    paddingTop: 120,
     paddingHorizontal: 16,
     paddingBottom: 20,
     justifyContent: 'space-between',
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   newsTimestamp: {
-    color: appColors.neutral,
+    color: 'rgba(251, 251, 251, 0.65)',
     fontSize: 12,
   },
   newsTitle: {
