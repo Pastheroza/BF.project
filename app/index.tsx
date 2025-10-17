@@ -88,8 +88,8 @@ function NewsCard({ item }: { item: NewsItem }) {
           
           {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
           <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']}
-            locations={[0.4, 0.7, 1]}
+            colors={['transparent', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.85)', 'rgba(0, 0, 0, 0.95)']}
+            locations={[0.35, 0.5, 0.7, 1]}
             style={styles.newsGradientOverlay}
           >
             {/* Контейнер для текстового контента (newsTextContent) */}
@@ -246,6 +246,9 @@ function NewsCard({ item }: { item: NewsItem }) {
         onRequestClose={handleClose}
       >
         <View style={styles.expandedContainer}>
+          {/* Безопасный отступ сверху (expandedTopSpacer) */}
+          <View style={[styles.expandedTopSpacer, { height: insets.top }]} />
+          
           {/* Изображение в полноэкранном режиме (expandedNewsImage) */}
           <Image
             source={{ uri: item.imageUrl }}
@@ -385,6 +388,9 @@ function NewsCard({ item }: { item: NewsItem }) {
         onRequestClose={handlePredictionClose}
       >
         <View style={styles.expandedContainer}>
+          {/* Безопасный отступ сверху (expandedTopSpacer) */}
+          <View style={[styles.expandedTopSpacer, { height: insets.top }]} />
+          
           {/* Кнопка закрытия (closeButton) */}
           <TouchableOpacity style={[styles.closeButton, { top: insets.top + 10 }]} onPress={handlePredictionClose}>
             <X size={28} color={appColors.light} />
@@ -722,6 +728,9 @@ const styles = StyleSheet.create({
   },
   expandedContainer: {
     flex: 1,
+    backgroundColor: appColors.dark,
+  },
+  expandedTopSpacer: {
     backgroundColor: appColors.dark,
   },
   expandedNewsImage: {
