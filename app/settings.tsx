@@ -24,7 +24,7 @@ export default function SettingsScreen() {
       {/* Настройка заголовка (headerConfig) */}
       <Stack.Screen
         options={{
-          title: 'Настройки',
+          title: 'Settings',
           headerStyle: {
             backgroundColor: appColors.dark,
           },
@@ -35,16 +35,16 @@ export default function SettingsScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Секция уведомлений (notificationsSection) */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Уведомления</Text>
+          <Text style={styles.sectionTitle}>Notifications</Text>
           
           {/* Настройка: Уведомления (notificationToggle) */}
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
               <Bell size={24} color={appColors.positive} />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Уведомления</Text>
+                <Text style={styles.settingTitle}>Notifications</Text>
                 <Text style={styles.settingDescription}>
-                  Получать уведомления о новых новостях
+                  Receive notifications about new news
                 </Text>
               </View>
             </View>
@@ -61,9 +61,9 @@ export default function SettingsScreen() {
             <View style={styles.settingLeft}>
               <Bell size={24} color={appColors.positive} />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Ценовые оповещения</Text>
+                <Text style={styles.settingTitle}>Price Alerts</Text>
                 <Text style={styles.settingDescription}>
-                  Уведомления о значительных изменениях цен
+                  Alerts about significant price changes
                 </Text>
               </View>
             </View>
@@ -78,15 +78,15 @@ export default function SettingsScreen() {
 
         {/* Секция основных настроек (generalSection) */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Основное</Text>
+          <Text style={styles.sectionTitle}>General</Text>
           
           {/* Настройка: Язык (languageSetting) */}
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
               <Globe size={24} color={appColors.positive} />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Язык</Text>
-                <Text style={styles.settingDescription}>Русский</Text>
+                <Text style={styles.settingTitle}>Language</Text>
+                <Text style={styles.settingDescription}>English</Text>
               </View>
             </View>
             <ChevronRight size={24} color={appColors.neutral} />
@@ -97,9 +97,9 @@ export default function SettingsScreen() {
             <View style={styles.settingLeft}>
               <Shield size={24} color={appColors.positive} />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Конфиденциальность</Text>
+                <Text style={styles.settingTitle}>Privacy</Text>
                 <Text style={styles.settingDescription}>
-                  Управление данными и безопасностью
+                  Data and security management
                 </Text>
               </View>
             </View>
@@ -111,8 +111,8 @@ export default function SettingsScreen() {
             <View style={styles.settingLeft}>
               <Info size={24} color={appColors.positive} />
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>О приложении</Text>
-                <Text style={styles.settingDescription}>Версия 1.0.0</Text>
+                <Text style={styles.settingTitle}>About</Text>
+                <Text style={styles.settingDescription}>Version 1.0.0</Text>
               </View>
             </View>
             <ChevronRight size={24} color={appColors.neutral} />
@@ -122,7 +122,7 @@ export default function SettingsScreen() {
         {/* Кнопка выхода (logoutButton) */}
         <TouchableOpacity style={styles.logoutButton}>
           <LogOut size={24} color={appColors.negative} />
-          <Text style={styles.logoutText}>Выйти из аккаунта</Text>
+          <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

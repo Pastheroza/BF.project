@@ -21,7 +21,7 @@ export default function ProfileScreen() {
       {/* Настройка заголовка (headerConfig) */}
       <Stack.Screen
         options={{
-          title: 'Профиль',
+          title: 'Profile',
           headerStyle: {
             backgroundColor: appColors.dark,
           },
@@ -38,15 +38,15 @@ export default function ProfileScreen() {
           </View>
           
           {/* Имя пользователя (userName) */}
-          <Text style={styles.userName}>Иван Иванов</Text>
+          <Text style={styles.userName}>John Doe</Text>
           
           {/* Email пользователя (userEmail) */}
-          <Text style={styles.userEmail}>ivan@example.com</Text>
+          <Text style={styles.userEmail}>john@example.com</Text>
         </View>
 
         {/* Секция статистики (statsSection) */}
         <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Статистика</Text>
+          <Text style={styles.sectionTitle}>Statistics</Text>
           
           {/* Контейнер карточек статистики (statsCards) */}
           <View style={styles.statsCards}>
@@ -54,14 +54,14 @@ export default function ProfileScreen() {
             <View style={styles.statCard}>
               <Clock size={24} color={appColors.positive} />
               <Text style={styles.statValue}>156</Text>
-              <Text style={styles.statLabel}>Прочитано новостей</Text>
+              <Text style={styles.statLabel}>News Read</Text>
             </View>
 
             {/* Карточка: Сохранено (savedCard) */}
             <View style={styles.statCard}>
               <Bookmark size={24} color={appColors.positive} />
               <Text style={styles.statValue}>23</Text>
-              <Text style={styles.statLabel}>Сохранено</Text>
+              <Text style={styles.statLabel}>Saved</Text>
             </View>
           </View>
 
@@ -70,42 +70,42 @@ export default function ProfileScreen() {
             <View style={styles.statCard}>
               <TrendingUp size={24} color={appColors.positive} />
               <Text style={styles.statValue}>78%</Text>
-              <Text style={styles.statLabel}>Точность прогнозов</Text>
+              <Text style={styles.statLabel}>Forecast Accuracy</Text>
             </View>
 
             {/* Карточка: Достижения (achievementsCard) */}
             <View style={styles.statCard}>
               <Award size={24} color={appColors.positive} />
               <Text style={styles.statValue}>5</Text>
-              <Text style={styles.statLabel}>Достижения</Text>
+              <Text style={styles.statLabel}>Achievements</Text>
             </View>
           </View>
         </View>
 
         {/* Секция интересов (interestsSection) */}
         <View style={styles.interestsSection}>
-          <Text style={styles.sectionTitle}>Интересы</Text>
+          <Text style={styles.sectionTitle}>Interests</Text>
           
           {/* Список интересов (interestsList) */}
           <View style={styles.interestsList}>
             <View style={styles.interestChip}>
-              <Text style={styles.interestText}>Технологии</Text>
+              <Text style={styles.interestText}>Technology</Text>
             </View>
             <View style={styles.interestChip}>
-              <Text style={styles.interestText}>Финансы</Text>
+              <Text style={styles.interestText}>Finance</Text>
             </View>
             <View style={styles.interestChip}>
-              <Text style={styles.interestText}>Автомобили</Text>
+              <Text style={styles.interestText}>Automotive</Text>
             </View>
             <View style={styles.interestChip}>
-              <Text style={styles.interestText}>Здоровье</Text>
+              <Text style={styles.interestText}>Health</Text>
             </View>
           </View>
         </View>
 
         {/* Кнопка редактирования профиля (editProfileButton) */}
         <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editButtonText}>Редактировать профиль</Text>
+          <Text style={styles.editButtonText}>Edit Profile</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
