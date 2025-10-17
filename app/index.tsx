@@ -491,7 +491,7 @@ function DesktopNewsCard({ item }: { item: NewsItem }) {
   }, []);
 
   const handleStockScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollViewWidth = 380;
+    const scrollViewWidth = SCREEN_WIDTH * 0.5 - 40;
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / scrollViewWidth);
     setCurrentStockIndex(index);
@@ -541,7 +541,7 @@ function DesktopNewsCard({ item }: { item: NewsItem }) {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               decelerationRate="fast"
-              snapToInterval={380}
+              snapToInterval={SCREEN_WIDTH * 0.5 - 40}
               snapToAlignment="center"
               onScroll={handleStockScroll}
               scrollEventThrottle={16}
@@ -1354,10 +1354,10 @@ const styles = StyleSheet.create({
     height: SCREEN_HEIGHT - 140,
   },
   desktopNewsCardLeft: {
-    flex: 1,
+    width: '50%',
   },
   desktopNewsCardRight: {
-    width: 420,
+    flex: 1,
     gap: 20,
   },
   desktopNewsWindow: {
@@ -1367,13 +1367,13 @@ const styles = StyleSheet.create({
     backgroundColor: appColors.cardBg,
   },
   desktopStocksWindow: {
-    height: 140,
+    flex: 0.4,
     borderRadius: 24,
     backgroundColor: appColors.cardBg,
     overflow: 'hidden',
   },
   desktopStockCard: {
-    width: 380,
+    width: SCREEN_WIDTH * 0.5 - 40,
     paddingHorizontal: 16,
     justifyContent: 'center',
     position: 'relative',
