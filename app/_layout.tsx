@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: "Назад" }}>
+    <Stack screenOptions={{ headerBackTitle: "Back" }}>
       <Stack.Screen name="index" options={{ headerShown: true }} />
       <Stack.Screen name="profile" options={{ headerShown: true }} />
       <Stack.Screen name="settings" options={{ headerShown: true }} />

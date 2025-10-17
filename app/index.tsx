@@ -83,7 +83,7 @@ function NewsCard({ item }: { item: NewsItem }) {
       <View style={styles.stocksWindow}>
         <View style={styles.stocksContent}>
           {/* Заголовок секции акций (stocksTitle) */}
-          <Text style={styles.stocksTitle}>Связанные акции</Text>
+          <Text style={styles.stocksTitle}>Related Stocks</Text>
           
           {/* Горизонтальный список акций (stocksHorizontalList) */}
           <ScrollView 
@@ -139,7 +139,7 @@ function NewsCard({ item }: { item: NewsItem }) {
       <View style={styles.predictionWindow}>
         <View style={styles.predictionContent}>
           {/* Заголовок секции прогноза (predictionTitle) */}
-          <Text style={styles.predictionTitle}>Прогноз влияния</Text>
+          <Text style={styles.predictionTitle}>Impact Forecast</Text>
           
           {/* Контейнер сентимента (sentimentContainer) */}
           <View
@@ -171,22 +171,22 @@ function NewsCard({ item }: { item: NewsItem }) {
             >
               <Text style={styles.sentimentText}>
                 {item.prediction.sentiment === 'positive'
-                  ? 'ПОЗИТИВНЫЙ'
+                  ? 'POSITIVE'
                   : item.prediction.sentiment === 'negative'
-                  ? 'НЕГАТИВНЫЙ'
-                  : 'НЕЙТРАЛЬНЫЙ'}
+                  ? 'NEGATIVE'
+                  : 'NEUTRAL'}
               </Text>
             </View>
             
             {/* Уровень влияния (impactLevel) */}
             <Text style={styles.impactLevel}>
-              Уровень влияния:{' '}
+              Impact Level:{' '}
               <Text style={styles.impactLevelValue}>
                 {item.prediction.impactLevel === 'high'
-                  ? 'ВЫСОКИЙ'
+                  ? 'HIGH'
                   : item.prediction.impactLevel === 'medium'
-                  ? 'СРЕДНИЙ'
-                  : 'НИЗКИЙ'}
+                  ? 'MEDIUM'
+                  : 'LOW'}
               </Text>
             </Text>
           </View>
@@ -235,7 +235,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             <Text style={styles.expandedNewsText}>{item.snippet}</Text>
             
             {/* Связанные акции в развернутом виде (expandedStocksSection) */}
-            <Text style={styles.expandedSectionTitle}>Связанные акции</Text>
+            <Text style={styles.expandedSectionTitle}>Related Stocks</Text>
             <View style={styles.expandedStocksList}>
               {item.relatedStocks.map((stock, index) => (
                 <View key={index} style={styles.expandedStockCard}>
@@ -277,7 +277,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             </View>
             
             {/* Прогноз в развернутом виде (expandedPredictionSection) */}
-            <Text style={styles.expandedSectionTitle}>Прогноз влияния</Text>
+            <Text style={styles.expandedSectionTitle}>Impact Forecast</Text>
             <View
               style={[
                 styles.expandedSentimentContainer,
@@ -306,20 +306,20 @@ function NewsCard({ item }: { item: NewsItem }) {
               >
                 <Text style={styles.expandedSentimentText}>
                   {item.prediction.sentiment === 'positive'
-                    ? 'ПОЗИТИВНЫЙ'
+                    ? 'POSITIVE'
                     : item.prediction.sentiment === 'negative'
-                    ? 'НЕГАТИВНЫЙ'
-                    : 'НЕЙТРАЛЬНЫЙ'}
+                    ? 'NEGATIVE'
+                    : 'NEUTRAL'}
                 </Text>
               </View>
               <Text style={styles.expandedImpactLevel}>
-                Уровень влияния:{' '}
+                Impact Level:{' '}
                 <Text style={styles.expandedImpactLevelValue}>
                   {item.prediction.impactLevel === 'high'
-                    ? 'ВЫСОКИЙ'
+                    ? 'HIGH'
                     : item.prediction.impactLevel === 'medium'
-                    ? 'СРЕДНИЙ'
-                    : 'НИЗКИЙ'}
+                    ? 'MEDIUM'
+                    : 'LOW'}
                 </Text>
               </Text>
             </View>
@@ -327,7 +327,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             <Text style={styles.expandedPredictionDescription}>
               {item.prediction.description}
             </Text>
-            <Text style={styles.expandedKeyPointsTitle}>Ключевые пункты:</Text>
+            <Text style={styles.expandedKeyPointsTitle}>Key Points:</Text>
             <View style={styles.expandedKeyPointsList}>
               {item.prediction.keyPoints.map((point, index) => (
                 <View key={index} style={styles.expandedKeyPointItem}>
@@ -363,36 +363,28 @@ export default function NewsFeedScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Настройка заголовка с кнопками (headerConfig) */}
       <Stack.Screen
         options={{
-          title: '',
-          headerStyle: {
-            backgroundColor: appColors.dark,
-          },
-          headerTintColor: appColors.light,
-          // Кнопка настроек слева (settingsButton)
-          headerLeft: () => (
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => router.push('./settings')}
-            >
-              <Settings size={24} color={appColors.light} />
-            </TouchableOpacity>
-          ),
-          // Кнопка профиля справа (profileButton)
-          headerRight: () => (
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => router.push('./profile')}
-            >
-              <User size={24} color={appColors.light} />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
 
-      {/* Вертикальный список новостей с улучшенным скроллингом (newsFeed) */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => router.push('./settings')}
+        >
+          <Settings size={24} color={appColors.light} />
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => router.push('./profile')}
+        >
+          <User size={24} color={appColors.light} />
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         ref={flatListRef}
         data={mockNewsData}
@@ -401,9 +393,10 @@ export default function NewsFeedScreen() {
         pagingEnabled
         showsVerticalScrollIndicator={false}
         snapToInterval={SCREEN_HEIGHT}
-        snapToAlignment="center"
+        snapToAlignment="start"
         decelerationRate="fast"
         scrollEventThrottle={16}
+        bounces={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         getItemLayout={(data, index) => ({
@@ -412,9 +405,9 @@ export default function NewsFeedScreen() {
           index,
         })}
         removeClippedSubviews
-        maxToRenderPerBatch={3}
-        windowSize={5}
-        initialNumToRender={2}
+        maxToRenderPerBatch={2}
+        windowSize={3}
+        initialNumToRender={1}
       />
     </View>
   );
@@ -425,22 +418,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: appColors.dark,
   },
+  headerContainer: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    zIndex: 100,
+  },
   headerButton: {
-    padding: 8,
-    marginHorizontal: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(12, 12, 12, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   newsCard: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     backgroundColor: appColors.dark,
-    padding: 16,
-    gap: 16,
+    paddingTop: 110,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
   },
   newsWindow: {
-    height: SCREEN_HEIGHT * 0.4,
+    flex: 1,
     borderRadius: 24,
     overflow: 'hidden',
     backgroundColor: appColors.cardBg,
+    marginBottom: 12,
   },
   newsCardContent: {
     flex: 1,
@@ -494,10 +504,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   stocksWindow: {
-    height: SCREEN_HEIGHT * 0.15,
+    height: 110,
     borderRadius: 24,
     backgroundColor: appColors.cardBg,
     overflow: 'hidden',
+    marginBottom: 12,
   },
   stocksContent: {
     flex: 1,
@@ -542,7 +553,7 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
   },
   predictionWindow: {
-    height: SCREEN_HEIGHT * 0.3,
+    height: 180,
     borderRadius: 24,
     backgroundColor: appColors.cardBg,
     overflow: 'hidden',
