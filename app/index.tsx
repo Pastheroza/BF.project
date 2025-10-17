@@ -9,9 +9,10 @@ import {
   TouchableOpacity,
   ScrollView,
   ViewToken,
+  Modal,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { Settings, User, TrendingUp, TrendingDown, Minus } from 'lucide-react-native';
+import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
 import { mockNewsData, NewsItem } from '@/mocks/news';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -27,32 +28,30 @@ const appColors = {
 } as const;
 
 // NewsCard - компонент для отображения одной новости
-// Содержит три горизонтальные секции: новость, акции, прогноз
+// Содержит три окна: новость (40%), акции (15%), прогноз (30%)
 function NewsCard({ item }: { item: NewsItem }) {
-  // Состояние текущей активной секции (currentSection)
-  const [currentSection, setCurrentSection] = useState<number>(0);
-  const scrollViewRef = useRef<ScrollView>(null);
+  // Состояние для раскрытия новости на весь экран (isExpanded)
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  // Обработчик прокрутки горизонтального ScrollView (handleScroll)
-  const handleScroll = useCallback((event: any) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const sectionIndex = Math.round(offsetX / SCREEN_WIDTH);
-    setCurrentSection(sectionIndex);
+  // Обработчик нажатия на окно новости (handleNewsPress)
+  const handleNewsPress = useCallback(() => {
+    setIsExpanded(true);
+  }, []);
+
+  // Обработчик закрытия полноэкранной новости (handleClose)
+  const handleClose = useCallback(() => {
+    setIsExpanded(false);
   }, []);
 
   return (
     <View style={styles.newsCard}>
-      {/* Горизонтальный ScrollView с тремя секциями (sectionsScrollView) */}
-      <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
-        scrollEventThrottle={16}
+      {/* Окно 1: Основная новость (newsWindow) - 40% экрана */}
+      <TouchableOpacity 
+        style={styles.newsWindow} 
+        activeOpacity={0.95}
+        onPress={handleNewsPress}
       >
-        {/* Секция 1: Основная новость (newsSection) */}
-        <View style={styles.section}>
+        <View style={styles.newsCardContent}>
           {/* Изображение новости (newsImage) */}
           <Image
             source={{ uri: item.imageUrl }}
@@ -60,8 +59,11 @@ function NewsCard({ item }: { item: NewsItem }) {
             resizeMode="cover"
           />
           
-          {/* Контейнер для текстового контента (newsContent) */}
-          <View style={styles.newsContent}>
+          {/* Оверлей с градиентом для читаемости текста (newsOverlay) */}
+          <View style={styles.newsOverlay} />
+          
+          {/* Контейнер для текстового контента (newsTextContent) */}
+          <View style={styles.newsTextContent}>
             {/* Метаинформация: источник и время (newsMeta) */}
             <View style={styles.newsMeta}>
               <Text style={styles.newsSource}>{item.source}</Text>
@@ -69,28 +71,176 @@ function NewsCard({ item }: { item: NewsItem }) {
             </View>
             
             {/* Заголовок новости (newsTitle) */}
-            <Text style={styles.newsTitle}>{item.title}</Text>
+            <Text style={styles.newsTitle} numberOfLines={3}>{item.title}</Text>
             
             {/* Краткое описание новости (newsSnippet) */}
-            <Text style={styles.newsSnippet}>{item.snippet}</Text>
+            <Text style={styles.newsSnippet} numberOfLines={2}>{item.snippet}</Text>
           </View>
         </View>
+      </TouchableOpacity>
 
-        {/* Секция 2: Информация о ценах акций (stocksSection) */}
-        <View style={styles.section}>
-          <View style={styles.sectionContent}>
-            {/* Заголовок секции акций (stocksSectionTitle) */}
-            <Text style={styles.sectionTitle}>Связанные акции</Text>
+      {/* Окно 2: Информация о ценах акций (stocksWindow) - 15% экрана */}
+      <View style={styles.stocksWindow}>
+        <View style={styles.stocksContent}>
+          {/* Заголовок секции акций (stocksTitle) */}
+          <Text style={styles.stocksTitle}>Связанные акции</Text>
+          
+          {/* Горизонтальный список акций (stocksHorizontalList) */}
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.stocksScrollContent}
+          >
+            {item.relatedStocks.map((stock, index) => (
+              // Компактная карточка акции (compactStockCard)
+              <View key={index} style={styles.compactStockCard}>
+                <View style={styles.stockTopRow}>
+                  {/* Тикер компании (stockSymbol) */}
+                  <Text style={styles.stockSymbol}>{stock.symbol}</Text>
+                  {/* Иконка изменения цены (priceChangeIcon) */}
+                  {stock.priceChange > 0 ? (
+                    <TrendingUp size={16} color={appColors.positive} />
+                  ) : stock.priceChange < 0 ? (
+                    <TrendingDown size={16} color={appColors.negative} />
+                  ) : (
+                    <Minus size={16} color={appColors.neutral} />
+                  )}
+                </View>
+                
+                {/* Текущая цена (stockPrice) */}
+                <Text style={styles.stockPrice}>
+                  ${stock.currentPrice.toFixed(2)}
+                </Text>
+                
+                {/* Изменение цены (stockChange) */}
+                <Text
+                  style={[
+                    styles.stockChange,
+                    {
+                      color:
+                        stock.priceChange > 0
+                          ? appColors.positive
+                          : stock.priceChange < 0
+                          ? appColors.negative
+                          : appColors.neutral,
+                    },
+                  ]}
+                >
+                  {stock.priceChange > 0 ? '+' : ''}
+                  {stock.priceChange.toFixed(2)}%
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
+
+      {/* Окно 3: Прогноз влияния (predictionWindow) - 30% экрана */}
+      <View style={styles.predictionWindow}>
+        <View style={styles.predictionContent}>
+          {/* Заголовок секции прогноза (predictionTitle) */}
+          <Text style={styles.predictionTitle}>Прогноз влияния</Text>
+          
+          {/* Контейнер сентимента (sentimentContainer) */}
+          <View
+            style={[
+              styles.sentimentContainer,
+              {
+                backgroundColor:
+                  item.prediction.sentiment === 'positive'
+                    ? `${appColors.positive}20`
+                    : item.prediction.sentiment === 'negative'
+                    ? `${appColors.negative}20`
+                    : `${appColors.neutral}20`,
+              },
+            ]}
+          >
+            {/* Метка сентимента (sentimentBadge) */}
+            <View
+              style={[
+                styles.sentimentBadge,
+                {
+                  backgroundColor:
+                    item.prediction.sentiment === 'positive'
+                      ? appColors.positive
+                      : item.prediction.sentiment === 'negative'
+                      ? appColors.negative
+                      : appColors.neutral,
+                },
+              ]}
+            >
+              <Text style={styles.sentimentText}>
+                {item.prediction.sentiment === 'positive'
+                  ? 'ПОЗИТИВНЫЙ'
+                  : item.prediction.sentiment === 'negative'
+                  ? 'НЕГАТИВНЫЙ'
+                  : 'НЕЙТРАЛЬНЫЙ'}
+              </Text>
+            </View>
             
-            {/* Список акций (stocksList) */}
-            <View style={styles.stocksList}>
+            {/* Уровень влияния (impactLevel) */}
+            <Text style={styles.impactLevel}>
+              Уровень влияния:{' '}
+              <Text style={styles.impactLevelValue}>
+                {item.prediction.impactLevel === 'high'
+                  ? 'ВЫСОКИЙ'
+                  : item.prediction.impactLevel === 'medium'
+                  ? 'СРЕДНИЙ'
+                  : 'НИЗКИЙ'}
+              </Text>
+            </Text>
+          </View>
+          
+          {/* Временной горизонт (timeframe) */}
+          <Text style={styles.timeframe}>{item.prediction.timeframe}</Text>
+          
+          {/* Описание прогноза (predictionDescription) */}
+          <Text style={styles.predictionDescription} numberOfLines={3}>
+            {item.prediction.description}
+          </Text>
+        </View>
+      </View>
+
+      {/* Модальное окно для полноэкранного просмотра новости (expandedNewsModal) */}
+      <Modal
+        visible={isExpanded}
+        animationType="slide"
+        onRequestClose={handleClose}
+      >
+        <View style={styles.expandedContainer}>
+          {/* Изображение в полноэкранном режиме (expandedNewsImage) */}
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={styles.expandedNewsImage}
+            resizeMode="cover"
+          />
+          
+          {/* Кнопка закрытия (closeButton) */}
+          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+            <X size={28} color={appColors.light} />
+          </TouchableOpacity>
+          
+          {/* Прокручиваемый контент новости (expandedScrollContent) */}
+          <ScrollView style={styles.expandedScrollView} contentContainerStyle={styles.expandedContent}>
+            {/* Метаинформация (expandedNewsMeta) */}
+            <View style={styles.expandedNewsMeta}>
+              <Text style={styles.expandedNewsSource}>{item.source}</Text>
+              <Text style={styles.expandedNewsTimestamp}>{item.timestamp}</Text>
+            </View>
+            
+            {/* Заголовок (expandedNewsTitle) */}
+            <Text style={styles.expandedNewsTitle}>{item.title}</Text>
+            
+            {/* Полный текст новости (expandedNewsText) */}
+            <Text style={styles.expandedNewsText}>{item.snippet}</Text>
+            
+            {/* Связанные акции в развернутом виде (expandedStocksSection) */}
+            <Text style={styles.expandedSectionTitle}>Связанные акции</Text>
+            <View style={styles.expandedStocksList}>
               {item.relatedStocks.map((stock, index) => (
-                // Карточка акции (stockCard)
-                <View key={index} style={styles.stockCard}>
-                  <View style={styles.stockHeader}>
-                    {/* Тикер компании (stockSymbol) */}
-                    <Text style={styles.stockSymbol}>{stock.symbol}</Text>
-                    {/* Иконка изменения цены (priceChangeIcon) */}
+                <View key={index} style={styles.expandedStockCard}>
+                  <View style={styles.expandedStockHeader}>
+                    <Text style={styles.expandedStockSymbol}>{stock.symbol}</Text>
                     {stock.priceChange > 0 ? (
                       <TrendingUp size={20} color={appColors.positive} />
                     ) : stock.priceChange < 0 ? (
@@ -99,21 +249,14 @@ function NewsCard({ item }: { item: NewsItem }) {
                       <Minus size={20} color={appColors.neutral} />
                     )}
                   </View>
-                  
-                  {/* Название компании (stockCompanyName) */}
-                  <Text style={styles.stockCompanyName}>{stock.companyName}</Text>
-                  
-                  {/* Контейнер цены (stockPriceContainer) */}
-                  <View style={styles.stockPriceContainer}>
-                    {/* Текущая цена (stockCurrentPrice) */}
-                    <Text style={styles.stockCurrentPrice}>
+                  <Text style={styles.expandedStockCompanyName}>{stock.companyName}</Text>
+                  <View style={styles.expandedStockPriceContainer}>
+                    <Text style={styles.expandedStockCurrentPrice}>
                       ${stock.currentPrice.toFixed(2)}
                     </Text>
-                    
-                    {/* Изменение цены (stockPriceChange) */}
                     <Text
                       style={[
-                        styles.stockPriceChange,
+                        styles.expandedStockPriceChange,
                         {
                           color:
                             stock.priceChange > 0
@@ -132,19 +275,12 @@ function NewsCard({ item }: { item: NewsItem }) {
                 </View>
               ))}
             </View>
-          </View>
-        </View>
-
-        {/* Секция 3: Прогноз влияния (predictionSection) */}
-        <View style={styles.section}>
-          <View style={styles.sectionContent}>
-            {/* Заголовок секции прогноза (predictionSectionTitle) */}
-            <Text style={styles.sectionTitle}>Прогноз влияния</Text>
             
-            {/* Контейнер сентимента (sentimentContainer) */}
+            {/* Прогноз в развернутом виде (expandedPredictionSection) */}
+            <Text style={styles.expandedSectionTitle}>Прогноз влияния</Text>
             <View
               style={[
-                styles.sentimentContainer,
+                styles.expandedSentimentContainer,
                 {
                   backgroundColor:
                     item.prediction.sentiment === 'positive'
@@ -155,10 +291,9 @@ function NewsCard({ item }: { item: NewsItem }) {
                 },
               ]}
             >
-              {/* Метка сентимента (sentimentBadge) */}
               <View
                 style={[
-                  styles.sentimentBadge,
+                  styles.expandedSentimentBadge,
                   {
                     backgroundColor:
                       item.prediction.sentiment === 'positive'
@@ -169,7 +304,7 @@ function NewsCard({ item }: { item: NewsItem }) {
                   },
                 ]}
               >
-                <Text style={styles.sentimentText}>
+                <Text style={styles.expandedSentimentText}>
                   {item.prediction.sentiment === 'positive'
                     ? 'ПОЗИТИВНЫЙ'
                     : item.prediction.sentiment === 'negative'
@@ -177,11 +312,9 @@ function NewsCard({ item }: { item: NewsItem }) {
                     : 'НЕЙТРАЛЬНЫЙ'}
                 </Text>
               </View>
-              
-              {/* Уровень влияния (impactLevel) */}
-              <Text style={styles.impactLevel}>
+              <Text style={styles.expandedImpactLevel}>
                 Уровень влияния:{' '}
-                <Text style={styles.impactLevelValue}>
+                <Text style={styles.expandedImpactLevelValue}>
                   {item.prediction.impactLevel === 'high'
                     ? 'ВЫСОКИЙ'
                     : item.prediction.impactLevel === 'medium'
@@ -190,41 +323,22 @@ function NewsCard({ item }: { item: NewsItem }) {
                 </Text>
               </Text>
             </View>
-            
-            {/* Временной горизонт (timeframe) */}
-            <Text style={styles.timeframe}>{item.prediction.timeframe}</Text>
-            
-            {/* Описание прогноза (predictionDescription) */}
-            <Text style={styles.predictionDescription}>
+            <Text style={styles.expandedTimeframe}>{item.prediction.timeframe}</Text>
+            <Text style={styles.expandedPredictionDescription}>
               {item.prediction.description}
             </Text>
-            
-            {/* Ключевые пункты (keyPoints) */}
-            <Text style={styles.keyPointsTitle}>Ключевые пункты:</Text>
-            <View style={styles.keyPointsList}>
+            <Text style={styles.expandedKeyPointsTitle}>Ключевые пункты:</Text>
+            <View style={styles.expandedKeyPointsList}>
               {item.prediction.keyPoints.map((point, index) => (
-                <View key={index} style={styles.keyPointItem}>
-                  <View style={styles.keyPointBullet} />
-                  <Text style={styles.keyPointText}>{point}</Text>
+                <View key={index} style={styles.expandedKeyPointItem}>
+                  <View style={styles.expandedKeyPointBullet} />
+                  <Text style={styles.expandedKeyPointText}>{point}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </ScrollView>
         </View>
-      </ScrollView>
-
-      {/* Индикаторы секций (sectionIndicators) */}
-      <View style={styles.sectionIndicators}>
-        {[0, 1, 2].map((index) => (
-          <View
-            key={index}
-            style={[
-              styles.indicator,
-              currentSection === index && styles.indicatorActive,
-            ]}
-          />
-        ))}
-      </View>
+      </Modal>
     </View>
   );
 }
@@ -236,13 +350,15 @@ export default function NewsFeedScreen() {
   // Обработчик изменения видимых элементов (onViewableItemsChanged)
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      console.log('Current visible news:', viewableItems[0]?.index);
+      if (viewableItems.length > 0 && viewableItems[0]?.index !== null) {
+        console.log('Current visible news:', viewableItems[0].index);
+      }
     },
     []
   );
 
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50,
+    itemVisiblePercentThreshold: 80,
   }).current;
 
   return (
@@ -276,7 +392,7 @@ export default function NewsFeedScreen() {
         }}
       />
 
-      {/* Вертикальный список новостей (newsFeed) */}
+      {/* Вертикальный список новостей с улучшенным скроллингом (newsFeed) */}
       <FlatList
         ref={flatListRef}
         data={mockNewsData}
@@ -285,8 +401,9 @@ export default function NewsFeedScreen() {
         pagingEnabled
         showsVerticalScrollIndicator={false}
         snapToInterval={SCREEN_HEIGHT}
-        snapToAlignment="start"
+        snapToAlignment="center"
         decelerationRate="fast"
+        scrollEventThrottle={16}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         getItemLayout={(data, index) => ({
@@ -294,6 +411,10 @@ export default function NewsFeedScreen() {
           offset: SCREEN_HEIGHT * index,
           index,
         })}
+        removeClippedSubviews
+        maxToRenderPerBatch={3}
+        windowSize={5}
+        initialNumToRender={2}
       />
     </View>
   );
@@ -312,19 +433,38 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     backgroundColor: appColors.dark,
+    padding: 16,
+    gap: 16,
   },
-  section: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+  newsWindow: {
+    height: SCREEN_HEIGHT * 0.4,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: appColors.cardBg,
+  },
+  newsCardContent: {
+    flex: 1,
+    position: 'relative',
   },
   newsImage: {
     width: '100%',
-    height: '50%',
+    height: '100%',
+    position: 'absolute',
   },
-  newsContent: {
-    flex: 1,
+  newsOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '70%',
+    backgroundColor: 'rgba(12, 12, 12, 0.85)',
+  },
+  newsTextContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     padding: 20,
-    justifyContent: 'flex-start',
   },
   newsMeta: {
     flexDirection: 'row',
@@ -343,84 +483,100 @@ const styles = StyleSheet.create({
   },
   newsTitle: {
     color: appColors.light,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700' as const,
-    marginBottom: 12,
-    lineHeight: 32,
+    marginBottom: 8,
+    lineHeight: 28,
   },
   newsSnippet: {
     color: appColors.neutral,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  sectionContent: {
-    flex: 1,
-    padding: 20,
-  },
-  sectionTitle: {
-    color: appColors.light,
-    fontSize: 28,
-    fontWeight: '700' as const,
-    marginBottom: 24,
-  },
-  stocksList: {
-    gap: 16,
-  },
-  stockCard: {
+  stocksWindow: {
+    height: SCREEN_HEIGHT * 0.15,
+    borderRadius: 24,
     backgroundColor: appColors.cardBg,
-    borderRadius: 16,
-    padding: 16,
-    gap: 8,
+    overflow: 'hidden',
   },
-  stockHeader: {
+  stocksContent: {
+    flex: 1,
+    paddingVertical: 16,
+  },
+  stocksTitle: {
+    color: appColors.light,
+    fontSize: 16,
+    fontWeight: '700' as const,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  stocksScrollContent: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  compactStockCard: {
+    backgroundColor: appColors.dark,
+    borderRadius: 16,
+    padding: 12,
+    minWidth: 120,
+    gap: 4,
+  },
+  stockTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 4,
   },
   stockSymbol: {
     color: appColors.light,
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700' as const,
   },
-  stockCompanyName: {
-    color: appColors.neutral,
-    fontSize: 14,
-  },
-  stockPriceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  stockCurrentPrice: {
+  stockPrice: {
     color: appColors.light,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '600' as const,
   },
-  stockPriceChange: {
-    fontSize: 14,
+  stockChange: {
+    fontSize: 12,
     fontWeight: '600' as const,
+  },
+  predictionWindow: {
+    height: SCREEN_HEIGHT * 0.3,
+    borderRadius: 24,
+    backgroundColor: appColors.cardBg,
+    overflow: 'hidden',
+  },
+  predictionContent: {
+    flex: 1,
+    padding: 20,
+  },
+  predictionTitle: {
+    color: appColors.light,
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 16,
   },
   sentimentContainer: {
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    padding: 12,
+    marginBottom: 12,
   },
   sentimentBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   sentimentText: {
     color: appColors.light,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700' as const,
   },
   impactLevel: {
     color: appColors.neutral,
-    fontSize: 14,
+    fontSize: 12,
   },
   impactLevelValue: {
     color: appColors.light,
@@ -428,60 +584,177 @@ const styles = StyleSheet.create({
   },
   timeframe: {
     color: appColors.positive,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600' as const,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   predictionDescription: {
+    color: appColors.light,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  expandedContainer: {
+    flex: 1,
+    backgroundColor: appColors.dark,
+  },
+  expandedNewsImage: {
+    width: '100%',
+    height: SCREEN_HEIGHT * 0.35,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(12, 12, 12, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  expandedScrollView: {
+    flex: 1,
+  },
+  expandedContent: {
+    padding: 20,
+  },
+  expandedNewsMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  expandedNewsSource: {
+    color: appColors.positive,
+    fontSize: 14,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase',
+  },
+  expandedNewsTimestamp: {
+    color: appColors.neutral,
+    fontSize: 14,
+  },
+  expandedNewsTitle: {
+    color: appColors.light,
+    fontSize: 28,
+    fontWeight: '700' as const,
+    marginBottom: 16,
+    lineHeight: 36,
+  },
+  expandedNewsText: {
+    color: appColors.neutral,
+    fontSize: 16,
+    lineHeight: 26,
+    marginBottom: 32,
+  },
+  expandedSectionTitle: {
+    color: appColors.light,
+    fontSize: 22,
+    fontWeight: '700' as const,
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  expandedStocksList: {
+    gap: 12,
+    marginBottom: 32,
+  },
+  expandedStockCard: {
+    backgroundColor: appColors.cardBg,
+    borderRadius: 16,
+    padding: 16,
+    gap: 8,
+  },
+  expandedStockHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  expandedStockSymbol: {
+    color: appColors.light,
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  expandedStockCompanyName: {
+    color: appColors.neutral,
+    fontSize: 14,
+  },
+  expandedStockPriceContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  expandedStockCurrentPrice: {
+    color: appColors.light,
+    fontSize: 24,
+    fontWeight: '600' as const,
+  },
+  expandedStockPriceChange: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+  },
+  expandedSentimentContainer: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  expandedSentimentBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  expandedSentimentText: {
+    color: appColors.light,
+    fontSize: 12,
+    fontWeight: '700' as const,
+  },
+  expandedImpactLevel: {
+    color: appColors.neutral,
+    fontSize: 14,
+  },
+  expandedImpactLevelValue: {
+    color: appColors.light,
+    fontWeight: '700' as const,
+  },
+  expandedTimeframe: {
+    color: appColors.positive,
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 12,
+  },
+  expandedPredictionDescription: {
     color: appColors.light,
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 20,
   },
-  keyPointsTitle: {
+  expandedKeyPointsTitle: {
     color: appColors.light,
     fontSize: 18,
     fontWeight: '600' as const,
     marginBottom: 12,
   },
-  keyPointsList: {
+  expandedKeyPointsList: {
     gap: 12,
+    marginBottom: 40,
   },
-  keyPointItem: {
+  expandedKeyPointItem: {
     flexDirection: 'row',
     gap: 12,
   },
-  keyPointBullet: {
+  expandedKeyPointBullet: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: appColors.positive,
     marginTop: 8,
   },
-  keyPointText: {
+  expandedKeyPointText: {
     flex: 1,
     color: appColors.neutral,
     fontSize: 14,
     lineHeight: 22,
-  },
-  sectionIndicators: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: appColors.neutral,
-    opacity: 0.5,
-  },
-  indicatorActive: {
-    backgroundColor: appColors.light,
-    opacity: 1,
   },
 });
