@@ -12,6 +12,7 @@ import {
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  SafeAreaView,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
@@ -86,8 +87,8 @@ function NewsCard({ item }: { item: NewsItem }) {
           
           {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
           <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.7)']}
-            locations={[0, 0.5, 1]}
+            colors={['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']}
+            locations={[0.5, 0.75, 1]}
             style={styles.newsGradientOverlay}
           >
             {/* Контейнер для текстового контента (newsTextContent) */}
@@ -243,7 +244,7 @@ function NewsCard({ item }: { item: NewsItem }) {
         animationType="slide"
         onRequestClose={handleClose}
       >
-        <View style={styles.expandedContainer}>
+        <SafeAreaView style={styles.expandedContainer}>
           {/* Изображение в полноэкранном режиме (expandedNewsImage) */}
           <Image
             source={{ uri: item.imageUrl }}
@@ -373,7 +374,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               ))}
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Модальное окно для полноэкранного просмотра прогноза (expandedPredictionModal) */}
@@ -382,7 +383,7 @@ function NewsCard({ item }: { item: NewsItem }) {
         animationType="slide"
         onRequestClose={handlePredictionClose}
       >
-        <View style={styles.expandedContainer}>
+        <SafeAreaView style={styles.expandedContainer}>
           {/* Кнопка закрытия (closeButton) */}
           <TouchableOpacity style={styles.closeButton} onPress={handlePredictionClose}>
             <X size={28} color={appColors.light} />
@@ -450,7 +451,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               ))}
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );
@@ -579,7 +580,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: '70%',
+    height: '100%',
   },
   newsTextContent: {
     padding: 20,
@@ -667,7 +668,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 4,
+    marginTop: 1,
   },
   paginationDot: {
     width: 6,
