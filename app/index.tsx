@@ -12,8 +12,8 @@ import {
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { Settings, User, TrendingUp, TrendingDown, Minus, X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -35,6 +35,7 @@ const appColors = {
 // NewsCard - компонент для отображения одной новости
 // Содержит три окна: новость (40%), акции (15%), прогноз (30%)
 function NewsCard({ item }: { item: NewsItem }) {
+  const insets = useSafeAreaInsets();
   // Состояние для раскрытия новости на весь экран (isExpanded)
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   // Состояние для раскрытия прогноза на весь экран (isPredictionExpanded)
@@ -88,7 +89,7 @@ function NewsCard({ item }: { item: NewsItem }) {
           {/* Градиентный оверлей для читаемости текста (newsGradientOverlay) */}
           <LinearGradient
             colors={['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']}
-            locations={[0.5, 0.75, 1]}
+            locations={[0.4, 0.7, 1]}
             style={styles.newsGradientOverlay}
           >
             {/* Контейнер для текстового контента (newsTextContent) */}
@@ -244,7 +245,7 @@ function NewsCard({ item }: { item: NewsItem }) {
         animationType="slide"
         onRequestClose={handleClose}
       >
-        <SafeAreaView style={styles.expandedContainer}>
+        <View style={styles.expandedContainer}>
           {/* Изображение в полноэкранном режиме (expandedNewsImage) */}
           <Image
             source={{ uri: item.imageUrl }}
@@ -253,7 +254,7 @@ function NewsCard({ item }: { item: NewsItem }) {
           />
           
           {/* Кнопка закрытия (closeButton) */}
-          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 10 }]} onPress={handleClose}>
             <X size={28} color={appColors.light} />
           </TouchableOpacity>
           
@@ -374,7 +375,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               ))}
             </View>
           </ScrollView>
-        </SafeAreaView>
+        </View>
       </Modal>
 
       {/* Модальное окно для полноэкранного просмотра прогноза (expandedPredictionModal) */}
@@ -383,9 +384,9 @@ function NewsCard({ item }: { item: NewsItem }) {
         animationType="slide"
         onRequestClose={handlePredictionClose}
       >
-        <SafeAreaView style={styles.expandedContainer}>
+        <View style={styles.expandedContainer}>
           {/* Кнопка закрытия (closeButton) */}
-          <TouchableOpacity style={styles.closeButton} onPress={handlePredictionClose}>
+          <TouchableOpacity style={[styles.closeButton, { top: insets.top + 10 }]} onPress={handlePredictionClose}>
             <X size={28} color={appColors.light} />
           </TouchableOpacity>
           
@@ -451,7 +452,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               ))}
             </View>
           </ScrollView>
-        </SafeAreaView>
+        </View>
       </Modal>
     </View>
   );
@@ -460,6 +461,7 @@ function NewsCard({ item }: { item: NewsItem }) {
 // NewsFeedScreen - главный экран с вертикальной прокруткой новостей
 export default function NewsFeedScreen() {
   const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
 
   // Обработчик изменения видимых элементов (onViewableItemsChanged)
   const onViewableItemsChanged = useCallback(
@@ -483,7 +485,7 @@ export default function NewsFeedScreen() {
         }}
       />
 
-      <View style={styles.headerContainer}>
+      <View style={[styles.headerContainer, { top: insets.top + 10 }]}>
         <TouchableOpacity
           style={styles.headerButton}
           onPress={() => router.push('./settings')}
@@ -534,7 +536,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: 'absolute',
-    top: 50,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 1,
+    marginTop: -2,
   },
   paginationDot: {
     width: 6,
@@ -729,7 +730,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: 50,
     right: 20,
     width: 44,
     height: 44,
@@ -744,6 +744,7 @@ const styles = StyleSheet.create({
   },
   expandedContent: {
     padding: 20,
+    paddingBottom: 60,
   },
   expandedNewsMeta: {
     flexDirection: 'row',
